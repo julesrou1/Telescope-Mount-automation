@@ -5,80 +5,62 @@ int M1nbsteptaken=0;
 int M2nbsteptaken=0;
 float M1position=0;
 float M2position=0;
+int Motordirectory[] = {M1dirPin,M1stepPin,M1nbsteptaken,M2dirPin,M2stepPin,M2nbsteptaken};
 
-void setAngularMotion(float angle,String Motor,int Direction,int Time=1000){
+int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken){
+  if (dirPin == NULL || stepPin == NULL || nbsteptaken == NULL) //flag if pointer were not created to prevend crash
+  {
+    return 0;
+  }else{
+    if (Motor=="M1")
+    {*dirPin = Motordirectory[0];
+    *stepPin = Motordirectory[1];
+    *nbsteptaken = Motordirectory[2];}
+    else if (Motor=="M2")
+    {*dirPin = Motordirectory[3];
+    *stepPin = Motordirectory[4];
+    *nbsteptaken = Motordirectory[5];}
+    else if (Motor=="M3")//motor 3 and 4 not declare may or may not be added to the system for now send to Motor 1
+    {*dirPin = Motordirectory[3];
+    *stepPin = Motordirectory[4];
+    *nbsteptaken = Motordirectory[5];}
+    else
+    {*dirPin = Motordirectory[3];
+    *stepPin = Motordirectory[4];
+    *nbsteptaken = Motordirectory[5];}
+    return 1;
+  }
+}
+
+float motorselectionposition(String Motor){
+    if (Motor=="M1"){return(M1position);}
+    else if (Motor=="M2"){return(M2position);}
+    else if (Motor=="M3"){return(M1position);}
+    else{return(M1position);}
+}
+
+
+void setAngularMotion(float angle,int dirPin,int stepPin,int nbsteptaken,int Direction,int Time=1000){
     int dir;
-    if (Motor=="M1"){
-      if (Direction==1){
-        digitalWrite(M1dirPin,HIGH);
-        dir=1;
-        }else{
-          digitalWrite(M1dirPin,LOW);
-          dir=-1;
-        }
-      }else{
-      if (Direction==1){
-        digitalWrite(M2dirPin,HIGH);
-        dir=1;
-      }else{
-        digitalWrite(M2dirPin,LOW);
-        dir=-1;
-      }
-    }
-
     int step=round(angle/(0.1125)); //warning 0.1125 for 1/16 step change value if using microstep
-    for(int x = 0; x < step; x++) {
-      if (Motor=="M1"){
-        digitalWrite(M1stepPin,HIGH);  
-        delayMicroseconds(Time);
-        digitalWrite(M1stepPin,LOW);
-        delayMicroseconds(Time);
-        M1nbsteptaken+=dir;
+
+    if (Direction==1){ //setup direction high seen has positive rotation
+      digitalWrite(dirPin,HIGH);
+      dir=1;
       }else{
-        digitalWrite(M2stepPin,HIGH); 
+        digitalWrite(dirPin,LOW);
+        dir=-1;}
+
+
+    for(int x = 0; x < step; x++) {
+        digitalWrite(stepPin,HIGH);  
         delayMicroseconds(Time);
-        digitalWrite(M2stepPin,LOW);
+        digitalWrite(stepPin,LOW);
         delayMicroseconds(Time);
-        M2nbsteptaken+=dir;
+        nbsteptaken+=dir;
       }
-    }
 }
 
-void constantRotation(String Motor,int step=3200,int Direction=1,int Time=1000){
-    int dir;
-    if (Motor=="M1"){
-      if (Direction==1){
-        digitalWrite(M1dirPin,HIGH);
-        dir=1;
-        }else{
-          digitalWrite(M1dirPin,LOW);
-          dir=-1;
-        }
-      }else{
-      if (Direction==1){
-        digitalWrite(M2dirPin,HIGH);
-        dir=1;
-      }else{
-        digitalWrite(M2dirPin,LOW);
-        dir=-1;
-      }
-    }
-    for(int x = 0; x < step; x++) {
-      if (Motor=="M1"){
-        M1nbsteptaken+=dir;
-        digitalWrite(M1stepPin,HIGH);  
-        delayMicroseconds(Time);
-        digitalWrite(M1stepPin,LOW);
-        delayMicroseconds(Time);  
-      }else{
-        digitalWrite(M2stepPin,HIGH); 
-        delayMicroseconds(Time);
-        digitalWrite(M2stepPin,LOW);
-        delayMicroseconds(Time); 
-        M1nbsteptaken+=dir;
-      }
-    }
-}
 
 void Motorpositionadd(int Motorsteptaken, float Motorposition){
   int angl=Motorsteptaken*0.1125;
@@ -87,12 +69,16 @@ void Motorpositionadd(int Motorsteptaken, float Motorposition){
 }
 
 void rotate(float angle,String Motor,int Direction){
-  setAngularMotion(angle,Motor,Direction,1000);
-  if (Motor=="M1")
-  {
-    Motorpositionadd(M1nbsteptaken,M1position);
-  }else{
-    Motorpositionadd(M2nbsteptaken,M2position);
-  }
-  
+  int dirPin;
+  int stepPin;
+  int nbsteptaken;
+  float Mposition;
+  int Time=1000;
+  int status = motorselection(Motor,&dirPin,&stepPin,&nbsteptaken);
+  if(status==0) {printf("Oh no issue with motorselection\n");};
+  Mposition = motorselectionposition(Motor);
+
+  setAngularMotion(angle,dirPin,stepPin,nbsteptaken,Direction,Time);
+
+  Motorpositionadd(nbsteptaken,Mposition);
 }

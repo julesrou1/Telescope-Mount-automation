@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include "functions.h"
+#include <stdio.h>
+//#include "visual.h"
 
 void setup() {
 // Sets the two pins as Outputs
@@ -34,6 +36,6 @@ void setup() {
 
 void loop() {
   while (digitalRead(inPin) == HIGH){
-    constantRotation("M1",3200,1,1000);
+    rotate(100,"M1",1);
   } 
 }
