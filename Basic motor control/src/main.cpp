@@ -36,6 +36,9 @@ void setup() {
 
 void loop() {
   while (digitalRead(inPin) == HIGH){
-    rotate(100,"M1",1);
+  float PosM1=0;
+
+  rotate(100,"M1",1,&PosM1);
+
   } 
 }

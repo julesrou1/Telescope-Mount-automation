@@ -27,18 +27,21 @@ const int  inPin = 48;
 const int outPin=53;
 
 
-int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken);
+int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken, int* reduction);
 //use to chose motor(define pin to use), simplify setAngularMotion a lot. return(MXdirPin,MXstepPin,MXnbsteptaken). May add more return such as time.
-float motorselectionposition(String Motor);
-//same as motorselection but for variable MXposition which is a float return(MXposition)
 
-void setAngularMotion(float angle,int dirPin,int stepPin,int nbsteptaken,int Direction,int Time);
+void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Direction,int Time);
 //Use to do set angle(in degree),  and the time between LOW and HIGH. 
 //microstepp conf is in function directly for now is't for 1/16 step(0.1125°) NEED TO ADD NEW ARGUMENT
 
-void Motorposition(int Motorsteptaken, float Motorposition);
+void Motorpositionadd(int* nbsteptaken, float* Motorposition, int reduction);
 //NEED TO ADD REDUCTION FATOR to have the correct value for now it's assume to be one for all motor
 
-void rotate(float angle,String Motor,int Direction);//use  motorselection setAngularMotion motorselectionposition and Motorposition to rotate the motor and note it's position change
+void rotate(float angle,String Motor,int Direction, float* Position);//use  motorselection setAngularMotion motorselectionposition 
+//and Motorposition to rotate the motor and note it's position change
+
+void positionreset(float* Pos);
+
+
 
 #endif
