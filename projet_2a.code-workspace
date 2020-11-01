@@ -3,10 +3,6 @@
 		{
 			"name": "Telescope-Mount-automation",
 			"path": "."
-		},
-		{
-			"name": "Basic motor control",
-			"path": "Basic motor control"
 		}
 	],
 	"settings": {
