@@ -4,6 +4,7 @@
 
 #include <Arduino.h>
 #include <math.h>
+#include "Find_And_Identify.h"
 
 // defines pins numbers FOR MOTOR 1
 // Step pin and directional pin
@@ -30,7 +31,7 @@ const int outPin=53;
 int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken, int* reduction);
 //use to chose motor(define pin to use), simplify setAngularMotion a lot. return(MXdirPin,MXstepPin,MXnbsteptaken). May add more return such as time.
 
-void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Direction,int Time);
+void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Direction,int reduction,int Time);
 //Use to do set angle(in degree),  and the time between LOW and HIGH. 
 //microstepp conf is in function directly for now is't for 1/16 step(0.1125°) NEED TO ADD NEW ARGUMENT
 
