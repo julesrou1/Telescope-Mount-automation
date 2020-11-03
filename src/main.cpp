@@ -2,6 +2,7 @@
 #include "functions.h"
 #include <stdio.h>
 #include "Find_And_Identify.h"
+//#include "sqlite3.h"
 
 void setup() {
 // Sets the two pins as Outputs

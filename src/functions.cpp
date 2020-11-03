@@ -40,7 +40,6 @@ void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Di
         digitalWrite(dirPin,LOW);
         dir=-1;}
 
-
     for(int x = 0; x < step; x++) {
         digitalWrite(stepPin,HIGH);  
         delayMicroseconds(Time);

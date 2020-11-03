@@ -31,12 +31,13 @@ int getDifference(Date dt1, Date dt2)
     return (n2 - n1);
 }
 
-float angleBehindTheSun(float RAH,float RAM, float RAS,Date dt2){
-    float RA=RAH*(360/24) + (RAM/60) + (RAS/3600); // angle behind the sun on the equinox
-    int daybetween = getDifference({ 21, 3, 2020 },dt2);
+float angleBehindTheSun(Date dt,float RA){
+
+    int daybetween = getDifference({ 21, 3, 2020 },dt);
     return(RA-daybetween*(360/365));
 }
 
 float declinationAngle(float lattitude, float AD){
     return(AD - lattitude);
 }
+
