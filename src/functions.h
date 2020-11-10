@@ -29,7 +29,7 @@ const int outPin=53;
 
 
 int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken, int* reduction);
-//use to chose motor(define pin to use), simplify setAngularMotion a lot. return(MXdirPin,MXstepPin,MXnbsteptaken). May add more return such as time.
+//use to chose motor(define pin to use), simplify setAngularMotion a lot. return(MXdirPin,MXstepPin,MXnbsteptaken,reduction). May add more return such as time.
 
 void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Direction,int reduction,int Time);
 //Use to do set angle(in degree),  and the time between LOW and HIGH. 
