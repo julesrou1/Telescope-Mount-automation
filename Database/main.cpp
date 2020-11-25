@@ -4,6 +4,8 @@
 
 #include <math.h>
 
+
+
 void angleFormating(float RAH,float RAM,float RAS,float ADD,float ADM,float ADS,float* RA,float* AD){
     *RA=RAH*(360/24) + (RAM/60) + (RAS/3600);
     *AD=ADD + (ADM/60) + (ADS/3600);

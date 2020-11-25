@@ -13,9 +13,9 @@ int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken, int* 
     *stepPin = Motordirectory[1];
     *reduction = Motordirectory[2];}
     else if (Motor=="M2")
-    {*dirPin = Motordirectory[2];
-    *stepPin = Motordirectory[3];
-    *reduction = Motordirectory[4];}
+    {*dirPin = Motordirectory[3];
+    *stepPin = Motordirectory[4];
+    *reduction = Motordirectory[5];}
     else if (Motor=="M3")//motor 3 and 4 not declare may or may not be added to the system for now send to Motor 2
     {*dirPin = Motordirectory[2];
     *stepPin = Motordirectory[3];
