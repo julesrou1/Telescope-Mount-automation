@@ -2,7 +2,7 @@
 
 #define FIND_AND_IDENTIFY_H
 
-#include <Arduino.h>
+
 #include <math.h>
 
 struct Date {int d, m, y;};
