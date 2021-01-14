@@ -29,7 +29,7 @@ int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken, int* 
 }
 
 
-void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Direction,int reduction,int Time=1000){
+void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Direction,int reduction,int Time){
     int dir;
     int step=round((angle*reduction)/(0.1125)); //warning 0.1125 for 1/16 step change value if using microstep
 
@@ -42,9 +42,10 @@ void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Di
 
     for(int x = 0; x < step; x++) {
         digitalWrite(stepPin,HIGH);  
-        delayMicroseconds(Time);
+        delayMicroseconds(500);
         digitalWrite(stepPin,LOW);
-        delayMicroseconds(Time);
+        delayMicroseconds(500);
+        //delay(133);
         *nbsteptaken+=dir;
       }
 }
@@ -60,18 +61,21 @@ void rotate(float angle,String Motor,int Direction, float* Position){
   int dirPin;
   int stepPin;
   int nbsteptaken=0;
-  int Time=1000;
+  int Time=134;
   int reduction;
   int status = motorselection(Motor,&dirPin,&stepPin,&nbsteptaken,&reduction);
   if(status==0) {printf("Oh no issue with motorselection\n");};
-
+  
   setAngularMotion(angle,dirPin,stepPin,&nbsteptaken,Direction,reduction,Time);
 
   Motorpositionadd(&nbsteptaken, Position,reduction);
 
 }
 
+void positionInit(float* PosMRA,float* PosMDA,float Polaris_RA,float Polaris_DA){
+  *PosMRA=Polaris_RA;
+  *PosMDA=Polaris_DA;
+}
 void positionreset(float* Pos){
   *Pos=0;
-  getDifference({ 1, 2, 2000 },{ 1, 2, 2004 });
 }

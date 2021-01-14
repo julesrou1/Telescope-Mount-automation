@@ -40,8 +40,8 @@ float angleBehindTheSun(Date dt,float RA){
     return(RA-(float) (daybetween*360/365));
 }
 
-float declinationAngle(float lattitude, float AD){
-    return(AD - lattitude);
+float declinationAngle(float lattitude, float AD){ //utilise pour verifier que l'object est observable si abs>90 non observable
+    return(AD - lattitude); //donne angle par rapport a la tangente au sol
 }
 
 
@@ -115,6 +115,7 @@ void getTime(int* hour,int* min,int* sec,int* day,int* month,int* year,float* De
 }
 
 float RApositionCalulation(float RAcorrige,float SoleilDeg, float DegTime){ 
+    // Not usefull actually
     // float Correctionsol=(SoleilDeg-90);
     // printf("Possition du couche de soleil soleil %f\n",SoleilDeg);
     // printf("Ecart entre soleil et couche du soleil %f\n",DegTime-SoleilDeg);
@@ -139,16 +140,17 @@ int main(){
     
     float Latitude=49.052502;
     int hsol=16;
-    int msol=59;
+    int msol=53;
     int ssol=0;
     float SoleilDeg=HourToDegree(hsol,msol,ssol);
 
     float ADcorrioge=declinationAngle(Latitude,AD);
     float RAcorrige=angleBehindTheSun({day,month,year},RA);
     printf("%f %f\n",RAcorrige,ADcorrioge);
-
-    printf("position astre par rapport a 90 : %f\n",RApositionCalulation(RAcorrige,SoleilDeg,DegTime));
-
+    HourToDegree(0, 25,0);
+    float Polaris_RA,Polaris_DA;
+    angleFormating(2,31,49.09,89,15,50.8,&Polaris_RA,&Polaris_DA);
+    printf("Polaris RA: %f DA: %f\n",angleBehindTheSun({day,month,year},Polaris_RA),Polaris_DA);
     return 0;
 
 

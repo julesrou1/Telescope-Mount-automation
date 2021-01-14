@@ -25,7 +25,8 @@ const int M2ms2pin = 39;
 const int M2ms3pin = 41;
 //Use for switch
 const int  inPin = 48;
-const int outPin=53;
+const int outPin=44;
+
 
 
 int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken, int* reduction);
@@ -41,8 +42,11 @@ void Motorpositionadd(int* nbsteptaken, float* Motorposition, int reduction);
 void rotate(float angle,String Motor,int Direction, float* Position);//use  motorselection setAngularMotion motorselectionposition 
 //and Motorposition to rotate the motor and note it's position change
 
-void positionreset(float* Pos);
+void positionInit(float* PosMRA,float* PosMDA,float Polaris_RA,float Polaris_DA);
+//Initial position of RA motor and DA motor to the corresponding value of polaris, to use after observing polaris.
 
+void positionreset(float* Pos);
+// to reset position to 0
 
 
 #endif
