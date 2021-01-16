@@ -5,6 +5,8 @@
 #include <Arduino.h>
 #include <math.h>
 #include "Find_And_Identify.h"
+#include <stdio.h>
+#include <TimerOne.h>
 
 // defines pins numbers FOR MOTOR 1
 // Step pin and directional pin
@@ -27,26 +29,38 @@ const int M2ms3pin = 41;
 const int  inPin = 48;
 const int outPin=44;
 
+typedef struct Motor{
+    String Name;
+    char Speed;
+    int dirPin;
+    int stepPin;
+    int Direction;//direction +1 for trigo -1 for clock
+    int Reduction; //reduction ratio
+    float Position;
+    int TimesSlow;
+    int TimesFast;
+} Motor;
 
+//fill struct M1 abd M2
+int MotorStructFiller(Motor* M1,Motor* M2);
 
-int motorselection(String Motor,int* dirPin,int* stepPin,int* nbsteptaken, int* reduction);
-//use to chose motor(define pin to use), simplify setAngularMotion a lot. return(MXdirPin,MXstepPin,MXnbsteptaken,reduction). May add more return such as time.
-
-void setAngularMotion(float angle,int dirPin,int stepPin,int* nbsteptaken,int Direction,int reduction,int Time);
-//Use to do set angle(in degree),  and the time between LOW and HIGH. 
+//Use to do move angle(in degree),  and the time between LOW and HIGH. 
 //microstepp conf is in function directly for now is't for 1/16 step(0.1125°) NEED TO ADD NEW ARGUMENT
+void setAngularMotion(float angle,Motor* M,int* nbsteptaken,char speed);
 
-void Motorpositionadd(int* nbsteptaken, float* Motorposition, int reduction);
-//NEED TO ADD REDUCTION FATOR to have the correct value for now it's assume to be one for all motor
+//Change position
+void Motorpositionadd(int* nbsteptaken,Motor* M);
 
-void rotate(float angle,String Motor,int Direction, float* Position);//use  motorselection setAngularMotion motorselectionposition 
-//and Motorposition to rotate the motor and note it's position change
+//Input angle to ratate, the motor the dirrection +1,-1 and the speed 'F' Fast, 'S' Slow rotate(1,&M2,-1,'F')
+//use setAngularMotion Motorpositionadd
+void rotate(float angle,Motor* M,int Direction,char speed);
 
-void positionInit(float* PosMRA,float* PosMDA,float Polaris_RA,float Polaris_DA);
 //Initial position of RA motor and DA motor to the corresponding value of polaris, to use after observing polaris.
+void positionInit(float* PosMRA,float* PosMDA,float Polaris_RA,float Polaris_DA);
 
-void positionreset(float* Pos);
 // to reset position to 0
+void positionreset(Motor* M);
+
 
 
 #endif

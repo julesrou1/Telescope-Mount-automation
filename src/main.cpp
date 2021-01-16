@@ -5,20 +5,18 @@
 #include <TimerOne.h>
 //#include "sqlite3.h"
 int RArotation=1;
-const int swPin = 2;
 int n=0;
+const int swPin = 2;
 const int VRx = A0;
 const int VRy = A1;
-const int down = 30;
-const int up =36;
-const int right = 34;
-const int left = 32;
 int mapX = 0;
 int mapY = 0;
 int xPosition = 0;
 int yPosition = 0;
 int swstate=0;
-
+int fill=0;
+struct Motor M1;
+struct Motor M2;
 void tim1(){
   if(swstate==1){
       xPosition = analogRead(VRx);
@@ -26,47 +24,30 @@ void tim1(){
       mapX = map(xPosition, 0, 1023, -512, 512);
       mapY = map(yPosition, 0, 1023, -512, 512);
       if(mapX>100){
-        digitalWrite(right,HIGH);
-        delay(1000);
-        digitalWrite(right,LOW);
+        rotate(1,&M1,1,'F');
       }
       if(mapX<-100){
-        digitalWrite(left,HIGH);
-        delay(1000);
-        digitalWrite(left,LOW);
+        rotate(1,&M1,-1,'F');
       }
       if(mapY>100){
-        digitalWrite(up,HIGH);
-        delay(1000);
-        digitalWrite(up,LOW);
+        rotate(1,&M2,1,'F');
       }
       if(mapY<-100){
-        digitalWrite(down,HIGH);
-        delay(1000);
-        digitalWrite(down,LOW);
+        rotate(1,&M2,-1,'F');
       }
       } 
-    if(swstate==0){
-    digitalWrite(up,LOW);
-    digitalWrite(down,LOW);
-    digitalWrite(right,LOW);
-    digitalWrite(left,LOW);
-    }
+    if(swstate==0){}
  }
-void blink(){
+void swactivation(){
   swstate=(swstate+1)%2;
 }
 void setup() {
   Serial.begin(9600); 
   pinMode(VRx, INPUT);
   pinMode(VRy, INPUT);
-  pinMode(up,OUTPUT);
-  pinMode(down,OUTPUT);
-  pinMode(right,OUTPUT);
-  pinMode(left,OUTPUT);
   pinMode(swPin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(swPin), blink, LOW);
-  Timer1.initialize(100);
+  attachInterrupt(digitalPinToInterrupt(swPin), swactivation, LOW);
+  Timer1.initialize(800);
   Timer1.attachInterrupt(tim1);
 
 // Sets the two pins as Outputs
@@ -92,19 +73,12 @@ void setup() {
   digitalWrite(M1ms1pin,HIGH);
   digitalWrite(M1ms2pin,HIGH);
   digitalWrite(M1ms3pin,HIGH);
-  //microstep resolution to 1
+  //microstep resolution to 1/16
   digitalWrite(M2ms1pin,HIGH);
   digitalWrite(M2ms2pin,HIGH);
   digitalWrite(M2ms3pin,HIGH);
 }
 
 void loop() {
-    //float PosM1=0;
-    float PosM2=0;
-    
-    while(RArotation==1){
-      rotate(360,"M2",1,&PosM2);
-      delay(500);
-    }
-    
+  if(fill!=1){fill=MotorStructFiller(&M1,&M2);}
 }
