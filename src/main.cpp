@@ -6,6 +6,7 @@
 //#include "sqlite3.h"
 int RArotation=1;
 int n=0;
+const int pinLED=4;
 const int swPin = 2;
 const int VRx = A0;
 const int VRy = A1;
@@ -19,24 +20,25 @@ struct Motor M1;
 struct Motor M2;
 void tim1(){
   if(swstate==1){
-      xPosition = analogRead(VRx);
-      yPosition = analogRead(VRy);
-      mapX = map(xPosition, 0, 1023, -512, 512);
-      mapY = map(yPosition, 0, 1023, -512, 512);
-      if(mapX>100){
-        rotate(1,&M1,1,'F');
-      }
-      if(mapX<-100){
-        rotate(1,&M1,-1,'F');
-      }
-      if(mapY>100){
-        rotate(1,&M2,1,'F');
-      }
-      if(mapY<-100){
-        rotate(1,&M2,-1,'F');
-      }
-      } 
-    if(swstate==0){}
+    digitalWrite(pinLED,HIGH);
+    xPosition = analogRead(VRx);
+    yPosition = analogRead(VRy);
+    mapX = map(xPosition, 0, 1023, -512, 512);
+    mapY = map(yPosition, 0, 1023, -512, 512);
+    if(mapX>100){
+      rotate(1,&M1,1,'F');
+    }
+    if(mapX<-100){
+      rotate(1,&M1,-1,'F');
+    }
+    if(mapY>100){
+      rotate(1,&M2,1,'F');
+    }
+    if(mapY<-100){
+      rotate(1,&M2,-1,'F');
+    }
+  } 
+  if(swstate==0){digitalWrite(pinLED,LOW);}
  }
 void swactivation(){
   swstate=(swstate+1)%2;
@@ -46,8 +48,9 @@ void setup() {
   pinMode(VRx, INPUT);
   pinMode(VRy, INPUT);
   pinMode(swPin, INPUT_PULLUP);
+  pinMode(pinLED,OUTPUT);
   attachInterrupt(digitalPinToInterrupt(swPin), swactivation, LOW);
-  Timer1.initialize(800);
+  Timer1.initialize(5000);
   Timer1.attachInterrupt(tim1);
 
 // Sets the two pins as Outputs
@@ -81,4 +84,6 @@ void setup() {
 
 void loop() {
   if(fill!=1){fill=MotorStructFiller(&M1,&M2);}
+  // rotate(90,&M2,1,'F');
+  // delay(500);
 }

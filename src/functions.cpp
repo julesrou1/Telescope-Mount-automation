@@ -9,7 +9,7 @@ int MotorStructFiller(Motor* M1,Motor* M2){
   M1->Direction=1;
   M1->Reduction=1;
   M1->Position=0;
-  M1->TimesFast=500;
+  M1->TimesFast=100;
   M1->TimesSlow=113;
 
   M2->Name="M2";
@@ -18,7 +18,7 @@ int MotorStructFiller(Motor* M1,Motor* M2){
   M2->Direction=1;
   M2->Reduction=1;
   M2->Position=0;
-  M2->TimesFast=500;
+  M2->TimesFast=100;
   M2->TimesSlow=500;
 
   return 1;
@@ -35,14 +35,14 @@ void setAngularMotion(float angle,Motor* M,int* nbsteptaken,char speed){
     {
       for(int x = 0; x < step; x++) {
         digitalWrite(M->stepPin,HIGH);  
-        delayMicroseconds(M->TimesFast);
+        delayMicroseconds(500);
         digitalWrite(M->stepPin,LOW);
         delayMicroseconds(M->TimesFast);
         *nbsteptaken+=(M->dirPin);}
     }else{
         for(int x = 0; x < step; x++) {
         digitalWrite(M->stepPin,HIGH);  
-        delay(M->TimesSlow);
+        delay(500);
         digitalWrite(M->stepPin,LOW);
         delay(M->TimesSlow);
         *nbsteptaken+=(M->dirPin);
