@@ -2,59 +2,157 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.PrintWriter;
+
 import com.fazecast.jSerialComm.*;
 
 public class GridWin extends JFrame implements ActionListener {
+
     protected JTextField textField;
     static SerialPort chosenPort;
+    protected JComboBox<String> portList;
+    protected JButton connectButton;
+    protected JLabel port;
+    protected JLabel conn;
+    protected JButton searchButton;
 
-    public GridWin(String titre, int x, int y){
+    @Override
+    public void actionPerformed(ActionEvent a) {
+        String cmd = a.getActionCommand();
+        switch (cmd)
+        {
+            case "Connecter" : //essai de connexion au port
+                chosenPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
+                chosenPort.setComPortParameters(9600, 8,1,0);
+                chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
+                if (chosenPort.openPort()) {
+                    System.out.println("Port ouvert !");
+                    connectButton.setText("Déconnecter");
+                    conn.setText("Connecté");
+                    portList.setEnabled(false);
+
+                    // création d'un thread pour envoyer des données à la carte.
+                    Thread thread = new Thread() {
+                        public void run() {
+                            //attente du tmps que la carte met à reset après connection
+                            try {
+                                Thread.sleep(100);
+                            } catch (Exception e) {
+                            }
+
+                            PrintWriter output = new PrintWriter(chosenPort.getOutputStream());
+                            //entrée dans une boucle infinie qui envoie du texte à la carte
+                            while (true) {
+                                output.print("1");
+                                output.flush();//envoie ce qu'on vient d'écrire dans le buffer
+                                //output.print("dec");
+                                //output.flush();
+                                try {
+                                    Thread.sleep(5000);
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+                    };
+                    thread.start();
+                }
+//                else {
+//                    System.out.println("Port fermé ...");
+//                }
+                break;
+            case "Déconnecter" :
+                // déconnection du port série
+                chosenPort.closePort();
+                portList.setEnabled(true);
+                connectButton.setText("Connecter");
+                conn.setText("Déconnecté");
+        }
+    }
+
+    public GridWin(String titre, int x, int y) {
         super(titre);
-        this.setLocation(400,200);
-        this.setSize(x,y);
+        this.setLocation(400, 200);
+        this.setSize(x, y);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         /*Création du panel port*/
         //Container pan=getContentPane();
-        JPanel portPanel=new JPanel();
-        JLabel port = new JLabel("Port :");
-        JLabel conn = new JLabel("Non connecté");
-        JComboBox<String> portList = new JComboBox<String>();
-        JButton connectButton = new JButton("Connecter");
+        JPanel portPanel = new JPanel();
+        port = new JLabel("Port :");
+        conn = new JLabel("Non connecté");
+        portList = new JComboBox<String>();
+        connectButton = new JButton("Connecter");
         connectButton.addActionListener(this);
         portPanel.add(port);
         portPanel.add(portList);
         portPanel.add(connectButton);
         portPanel.add(conn);
-        this.add(portPanel,BorderLayout.NORTH);
+        this.add(portPanel, BorderLayout.NORTH);
 
         /*remplissage de la liste des ports*/
         SerialPort[] portNames = SerialPort.getCommPorts();
-        for (int i=0;i<portNames.length;i++){
+        for (int i = 0; i < portNames.length; i++) {
             portList.addItem(portNames[i].getSystemPortName());
         }
         /*Création du panel text*/
-        JPanel textPanel=new JPanel();
-        JButton searchButton=new JButton("Rechercher");
-        textField=new JTextField(20);
+        JPanel textPanel = new JPanel();
+        searchButton = new JButton("Rechercher");
+        searchButton.addActionListener(this);
+        textField = new JTextField(20);
         textField.addActionListener(this);
         textPanel.add(textField);
         textPanel.add(searchButton);
-        this.add(textPanel,BorderLayout.CENTER);
+        this.add(textPanel, BorderLayout.CENTER);
 
+/*        *//* Configuration du bouton de connexion *//*
+        connectButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (connectButton.getText().equals("Connect")) {
+                    //essai de connexion au port
+                    chosenPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
+                    chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+                    if (chosenPort.openPort()) {
+                        connectButton.setText("Déconnecter");
+                        conn.setText("Connecté");
+                        portList.setEnabled(false);
+
+                        // création d'un thread pour envoyer des données à la carte.
+                        Thread thread = new Thread() {
+                            public void run() {
+                                //attente du tmps que la carte met à reset après connection
+                                try {
+                                    Thread.sleep(100);
+                                } catch (Exception e) {
+                                }
+
+                                PrintWriter output = new PrintWriter(chosenPort.getOutputStream());
+                                //entrée dans une boucle infinie qui envoie du texte à la carte
+                                while (true) {
+                                    output.print("ra");
+                                    output.flush();//envoie ce qu'on vient d'écrire dans le buffer
+                                    output.print("dec");
+                                    output.flush();
+                                    try{Thread.sleep(1000);} catch (Exception e) {}
+                                }
+                            }
+                        };
+                        thread.start();
+                    }
+                } else {
+                    // déconnection du port série
+                    chosenPort.closePort();
+                    portList.setEnabled(true);
+                    connectButton.setText("Connecter");
+                    conn.setText("Déconnecté");
+                }
+            }
+        });*/
 
         /* rend la fenêtre visible*/
         this.setVisible(true);
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String cmd = e.getActionCommand();
-        switch(cmd){
-            //case "Connecter" : chosenPort = SerialPort.getCommPort(portList)
-        }
-
-
-    }
 }
+
+
