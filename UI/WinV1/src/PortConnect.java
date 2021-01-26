@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import com.fazecast.jSerialComm.*;
@@ -18,7 +19,7 @@ public class PortConnect {
         //Visiblement impossible de former le code en sous fonctions
         //Donc on va rester sur du bourrinage
 
-        SerialPort sp = SerialPort.getCommPort("COM4");
+        SerialPort sp = SerialPort.getCommPort("COM5");
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING,0,0);
         if (sp.openPort()){
@@ -27,12 +28,21 @@ public class PortConnect {
             System.out.println("Port fermé...");
         }
 
-        for (Integer I=0;I<5;I++) {
+/*        for (Integer I=0;I<5;I++) {
             sp.getOutputStream().write(I.byteValue());
             sp.getOutputStream().flush();
             System.out.println("Je viens d'envoyer :" + I);
-            Thread.sleep(1000);
-        }
+            Thread.sleep(100);
+        }*/
+        String test="101";
+        sp.getOutputStream().write(test.getBytes("ASCII"));
+        sp.getOutputStream().flush();
+        System.out.println("Je viens d'envoyer :"+ test);
+/*        OutputStream output = sp.getOutputStream();
+        PrintWriter outprint = new PrintWriter(output);
+        outprint.print(test);*/
+        //System.out.println("Je viens d'envoyer :"+ test);
+        Thread.sleep(1000);
 
         if (sp.closePort()){
             System.out.println("Port refermé !");
