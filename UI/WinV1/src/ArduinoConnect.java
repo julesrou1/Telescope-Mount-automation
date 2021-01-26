@@ -5,7 +5,8 @@ import java.nio.charset.StandardCharsets;
 
 public class ArduinoConnect {
 SerialPort sp;
-    public ArduinoConnect(String port){
+    public ArduinoConnect(String port,char buf) throws IOException, InterruptedException {
+       //Ouverture du port
         sp = SerialPort.getCommPort(port);
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING,0,0);
@@ -14,17 +15,12 @@ SerialPort sp;
         } else {
             System.out.println("Port fermé...");
         }
-    }
-    public void ArduinoSend() throws IOException, InterruptedException {
-        for (Integer I=0;I<5;I++) {
-            sp.getOutputStream().write(I.byteValue());
-            sp.getOutputStream().flush();
-            System.out.println("Je viens d'envoyer :" + I);
-            Thread.sleep(1000);
-        }
-    }
-
-    public void ArdDC(){
+        //Envoi des données
+        sp.getOutputStream().write(buf);
+        sp.getOutputStream().flush();
+        System.out.println("Je viens d'envoyer :" + buf);
+        Thread.sleep(1000);
+        //Fermeture du port
         if (sp.closePort()){
             System.out.println("Port refermé !");
         } else {

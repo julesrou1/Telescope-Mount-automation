@@ -6,8 +6,9 @@ import java.sql.Statement;
 
 
 public class Query {
-    Data coords = new Data();
+    //Data coords = new Data();
     public Query(String id, String path){
+        Data coords = new Data();
         // id = id de l'astre voulu
         //path = D:\\............\\database.db
         Connection conn = null;
@@ -23,8 +24,9 @@ public class Query {
                 stmt=conn.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 while(rs.next()) {
-                    coords.setRa(rs.getString("ra"));
-                    coords.setDec(rs.getString("dec"));
+                    coords.setRa(rs.getString("ra").toCharArray());//Toutes mes données sont dans des chaines de caractères
+                    coords.setDec(rs.getString("dec").toCharArray());
+                    coords.setTime();
                     coords.printData();
                 }
             }

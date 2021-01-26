@@ -21,54 +21,28 @@ public class GridWin extends JFrame implements ActionListener {
         String cmd = a.getActionCommand();
         switch (cmd)
         {
-            case "Connecter" : //essai de connexion au port
+            case "Verrouiller" : //Séléction du port d'envoi
                 chosenPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
-                chosenPort.setComPortParameters(9600, 8,1,0);
-                chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
-                if (chosenPort.openPort()) {
-                    System.out.println("Port ouvert !");
-                    connectButton.setText("Déconnecter");
-                    conn.setText("Connecté");
-                    portList.setEnabled(false);
+                //chosenPort.setComPortParameters(9600, 8,1,0);
+                //chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0); inclus dans la classe ArduinoConnect
+                System.out.println("Port choisi !");
+                connectButton.setText("Déverrouiller");
+                conn.setText("Port séléctionné");
+                portList.setEnabled(false);
 
-                    // création d'un thread pour envoyer des données à la carte.
-                    Thread thread = new Thread() {
-                        public void run() {
-                            //attente du tmps que la carte met à reset après connection
-                            try {
-                                Thread.sleep(100);
-                            } catch (Exception e) {
-                            }
-
-                            PrintWriter output = new PrintWriter(chosenPort.getOutputStream());
-                            //entrée dans une boucle infinie qui envoie du texte à la carte
-                            while (true) {
-                                output.print("1");
-                                output.flush();//envoie ce qu'on vient d'écrire dans le buffer
-                                //output.print("dec");
-                                //output.flush();
-                                try {
-                                    Thread.sleep(5000);
-                                } catch (Exception e) {
-                                }
-                            }
-                        }
-                    };
-                    thread.start();
-                }
-//                else {
-//                    System.out.println("Port fermé ...");
-//                }
                 break;
-            case "Déconnecter" :
-                // déconnection du port série
+            case "Déverrouiller" :
+                // Désélectionne le port
                 chosenPort.closePort();
                 portList.setEnabled(true);
-                connectButton.setText("Connecter");
-                conn.setText("Déconnecté");
+                connectButton.setText("Verrouiller");
+                conn.setText("Port non sélectionné");
                 break;
             case "Rechercher" :
-                //Récupération de l'id + recherche dans la bdd + envoi à la arduino
+                //Récupération de l'id + recherche dans la bdd + ouverture du port + envoi à la arduino du buffer + fermeture du port
+                System.out.println(textField.getText());// ptits test despi
+                textField.setText("");
+                break;
         }
     }
 
@@ -83,9 +57,9 @@ public class GridWin extends JFrame implements ActionListener {
         //Container pan=getContentPane();
         JPanel portPanel = new JPanel();
         port = new JLabel("Port :");
-        conn = new JLabel("Non connecté");
+        conn = new JLabel("Port non sélectionné");
         portList = new JComboBox<String>();
-        connectButton = new JButton("Connecter");
+        connectButton = new JButton("Verrouiller");
         connectButton.addActionListener(this);
         portPanel.add(port);
         portPanel.add(portList);

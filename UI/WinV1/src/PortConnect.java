@@ -19,6 +19,8 @@ public class PortConnect {
         //Visiblement impossible de former le code en sous fonctions
         //Donc on va rester sur du bourrinage
 
+        // A TESTER AVEC LA METHODE ARDUINOCONNECT AU LIEU DE TOUT CE BOUZIN
+
         SerialPort sp = SerialPort.getCommPort("COM5");
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING,0,0);
@@ -35,7 +37,7 @@ public class PortConnect {
             Thread.sleep(100);
         }*/
         String test="101";
-        sp.getOutputStream().write(test.getBytes("ASCII"));
+        sp.getOutputStream().write(test.getBytes("ASCII"));//// Les caractères sortent en code donc on va éviter de mettre des lettres
         sp.getOutputStream().flush();
         System.out.println("Je viens d'envoyer :"+ test);
 /*        OutputStream output = sp.getOutputStream();
