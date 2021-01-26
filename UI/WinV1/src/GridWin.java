@@ -66,6 +66,9 @@ public class GridWin extends JFrame implements ActionListener {
                 portList.setEnabled(true);
                 connectButton.setText("Connecter");
                 conn.setText("Déconnecté");
+                break;
+            case "Rechercher" :
+                //Récupération de l'id + recherche dans la bdd + envoi à la arduino
         }
     }
 

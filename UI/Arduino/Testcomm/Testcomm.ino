@@ -23,3 +23,11 @@ if (Serial1.available() >0){
   }
 
 }
+//
+//void SerialEvent1(){
+//    byte incomingByte = Serial1.read();
+//    if (incomingByte != -1){
+//      Serial.print("J'ai reçu : ");
+//      Serial.println(incomingByte);
+//    }
+//}
