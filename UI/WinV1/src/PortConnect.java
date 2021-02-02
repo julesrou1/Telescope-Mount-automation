@@ -36,15 +36,18 @@ public class PortConnect {
             System.out.println("Je viens d'envoyer :" + I);
             Thread.sleep(100);
         }*/
-        String test="101";
-        sp.getOutputStream().write(test.getBytes("ASCII"));//// Les caractères sortent en code donc on va éviter de mettre des lettres
+        String test="1;40.03158;-0.24587;2021;02;01;15;30;12;";
+        char[] ctest=test.toCharArray();
+        for (char c : ctest) {
+            sp.getOutputStream().write(c);//// essai avec une chaine de chiffres
+        }
         sp.getOutputStream().flush();
-        System.out.println("Je viens d'envoyer :"+ test);
+        System.out.println("Je viens d'envoyer :"+ ctest.toString());
 /*        OutputStream output = sp.getOutputStream();
         PrintWriter outprint = new PrintWriter(output);
         outprint.print(test);*/
         //System.out.println("Je viens d'envoyer :"+ test);
-        Thread.sleep(1000);
+        Thread.sleep(1);
 
         if (sp.closePort()){
             System.out.println("Port refermé !");
