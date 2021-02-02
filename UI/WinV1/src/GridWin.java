@@ -40,7 +40,10 @@ public class GridWin extends JFrame implements ActionListener {
                 break;
             case "Rechercher" :
                 //Récupération de l'id + recherche dans la bdd + ouverture du port + envoi à la arduino du buffer + fermeture du port
-                System.out.println(textField.getText());// ptits test despi
+                String id = textField.getText();
+                System.out.println(id);// ptits test despi
+                Data data=new Data(id,"C:\\Users\\Ggvg1\\Documents\\GitHub\\Telescope-Mount-automation\\Database\\data2.db");
+
                 textField.setText("");
                 break;
         }

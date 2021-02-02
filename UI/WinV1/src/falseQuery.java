@@ -5,10 +5,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 
-public class Query {
+public class falseQuery {
     //Data coords = new Data();
-    public Query(String id, String path){
-        Data coords = new Data();
+    public falseQuery(String id, String path){
+        //Data coords = new Data();
         // id = id de l'astre voulu
         //path = D:\\............\\database.db
         Connection conn = null;
@@ -24,10 +24,10 @@ public class Query {
                 stmt=conn.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 while(rs.next()) {
-                    coords.setRa(rs.getString("ra").toCharArray());//Toutes mes données sont dans des chaines de caractères
-                    coords.setDec(rs.getString("dec").toCharArray());
-                    coords.setTime();
-                    coords.printData();
+                    //coords.setRa(rs.getString("ra").toCharArray());//Toutes mes données sont dans des chaines de caractères
+                    //coords.setDec(rs.getString("dec").toCharArray());
+                    //coords.setTime();
+                    //coords.printData();
                 }
             }
             catch (SQLException e) {
