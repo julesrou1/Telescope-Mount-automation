@@ -4,6 +4,8 @@
 
 
 #include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 struct Date {int d, m, y;};
 //Find and Identify
@@ -17,4 +19,6 @@ int getDifference(Date dt1, Date dt2);
 float angleBehindTheSun(float RAH,float RAM, float RAS,Date dt2);
 
 float declinationAngle(float lattitude, float AD);
+
+
 #endif

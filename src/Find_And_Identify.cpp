@@ -40,4 +40,3 @@ float angleBehindTheSun(Date dt,float RA){
 float declinationAngle(float lattitude, float AD){
     return(AD - lattitude);
 }
-

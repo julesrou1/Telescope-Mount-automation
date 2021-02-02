@@ -1,30 +1,25 @@
 #include <Arduino.h>
 #include "functions.h"
-#include <stdio.h>
 #include "Find_And_Identify.h"
-#include <TimerOne.h>
-//#include "sqlite3.h"
+
 int RArotation=1;
-int n=0;
-const int pinLED=4;
-const int swPin = 2;
-const int VRx = A0;
-const int VRy = A1;
 int mapX = 0;
 int mapY = 0;
-int xPosition = 0;
-int yPosition = 0;
 int swstate=0;
 int fill=0;
+
 struct Motor M1;
 struct Motor M2;
+struct Motor M3;
+struct MsgReceived msg;
 void tim1(){
+  if(swstate==2){
+    cstRotate(&M1,1);
+  }
   if(swstate==1){
     digitalWrite(pinLED,HIGH);
-    xPosition = analogRead(VRx);
-    yPosition = analogRead(VRy);
-    mapX = map(xPosition, 0, 1023, -512, 512);
-    mapY = map(yPosition, 0, 1023, -512, 512);
+    mapX = map(analogRead(VRx), 0, 1023, -512, 512);
+    mapY = map(analogRead(VRy), 0, 1023, -512, 512);
     if(mapX>100){
       rotate(1,&M1,1,'F');
     }
@@ -40,8 +35,15 @@ void tim1(){
   } 
   if(swstate==0){digitalWrite(pinLED,LOW);}
  }
+void tim4(){
+  if (fill==1){
+  if(M1.cst==1){M1.EquatorialPosition+=(0.417828/2);
+  }else{M1.EquatorialPosition-=(0.417828/2);}
+  }
+}
+
 void swactivation(){
-  swstate=(swstate+1)%2;
+  swstate=(swstate+1)%3;
 }
 void setup() {
   Serial.begin(9600); 
@@ -50,9 +52,10 @@ void setup() {
   pinMode(swPin, INPUT_PULLUP);
   pinMode(pinLED,OUTPUT);
   attachInterrupt(digitalPinToInterrupt(swPin), swactivation, LOW);
-  Timer1.initialize(5000);
+  Timer1.initialize(500000);
   Timer1.attachInterrupt(tim1);
-
+  Timer4.initialize(1000000);
+	Timer4.attachInterrupt(tim4);
 // Sets the two pins as Outputs
   pinMode(M1stepPin,OUTPUT); 
   pinMode(M1dirPin,OUTPUT);
@@ -83,7 +86,6 @@ void setup() {
 }
 
 void loop() {
-  if(fill!=1){fill=MotorStructFiller(&M1,&M2);}
-  // rotate(90,&M2,1,'F');
-  // delay(500);
+  if(fill!=1){fill=MotorStructFiller(&M1,&M2,&M3);}
+  read(&msg);
 }
