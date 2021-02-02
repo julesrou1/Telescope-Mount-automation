@@ -11,9 +11,10 @@ import java.sql.Statement;
 public class Data {
 
     /* sert à stocker les valeurs qu'on va chercher dans la bdd */
-    protected char[] ra;
-    protected char[] dec;
-    protected char[] time;
+    protected String ra;
+    protected String dec;
+    protected String time;
+    protected String mode;
 
     public Data(String id, String path){
         Connection conn = null;
@@ -29,9 +30,9 @@ public class Data {
                 stmt=conn.createStatement();
                 ResultSet rs = stmt.executeQuery(query);
                 while(rs.next()) {
-                    ra=rs.getString("ra").toCharArray();//Toutes mes données sont dans des chaines de caractères
-                    dec=rs.getString("dec").toCharArray();
-                    //setTime();
+                    setRa(rs.getString("ra"));//Toutes mes données sont dans des chaines de caractères, mais je fais la conversion juste avant l'envoi de string a char[]
+                    setDec(rs.getString("dec"));
+                    setTime();
                     //printData();
                 }
             }
@@ -60,13 +61,14 @@ public class Data {
     public void setTime(){
         SimpleDateFormat s= new SimpleDateFormat("yyyy;MM;dd;HH;mm;ss");
         Date date=new Date();
-        time=s.format(date).toCharArray();
+        time=s.format(date);
     }
 
+    public void setMode(String m){mode=m+";";}
 
-    public void setRa(char[] a){ra=a;}
+    public void setRa(String a){ra=a+";";}
 
-    public void setDec(char[] b){dec=b;}
+    public void setDec(String b){dec=b+";";}
 
     public void printData(){
         System.out.println(this.ra);

@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import com.fazecast.jSerialComm.*;
@@ -10,6 +11,7 @@ public class GridWin extends JFrame implements ActionListener {
 
     protected JTextField textField;
     static SerialPort chosenPort;
+    protected String cport;
     protected JComboBox<String> portList;
     protected JButton connectButton;
     protected JLabel port;
@@ -22,7 +24,8 @@ public class GridWin extends JFrame implements ActionListener {
         switch (cmd)
         {
             case "Verrouiller" : //Séléction du port d'envoi
-                chosenPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
+               //chosenPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
+                cport=portList.getSelectedItem().toString();
                 //chosenPort.setComPortParameters(9600, 8,1,0);
                 //chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0); inclus dans la classe ArduinoConnect
                 System.out.println("Port choisi !");
@@ -33,7 +36,7 @@ public class GridWin extends JFrame implements ActionListener {
                 break;
             case "Déverrouiller" :
                 // Désélectionne le port
-                chosenPort.closePort();
+                //chosenPort.closePort();
                 portList.setEnabled(true);
                 connectButton.setText("Verrouiller");
                 conn.setText("Port non sélectionné");
@@ -42,8 +45,15 @@ public class GridWin extends JFrame implements ActionListener {
                 //Récupération de l'id + recherche dans la bdd + ouverture du port + envoi à la arduino du buffer + fermeture du port
                 String id = textField.getText();
                 System.out.println(id);// ptits test despi
-                Data data=new Data(id,"C:\\Users\\Ggvg1\\Documents\\GitHub\\Telescope-Mount-automation\\Database\\data2.db");
-
+                Data data=new Data(id,"C:\\Users\\Germain\\Documents\\GitHub\\Telescope-Mount-automation\\Database\\data2.db");
+                data.printData();
+                try {
+                    ArduinoConnect con = new ArduinoConnect(cport,data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 textField.setText("");
                 break;
         }

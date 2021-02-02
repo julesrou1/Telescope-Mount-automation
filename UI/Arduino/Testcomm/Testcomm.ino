@@ -1,5 +1,5 @@
 #include <SoftwareSerial.h>
-#include <TimerThree.h>
+//#include <TimerThree.h>
 
 SoftwareSerial sserial(22,24); //j'ai branché le tx de mon usb-TTL sur le port Rx1=22 , surement remplaceable avec Serial1.write()/Serial1.read ----> OUI
 char buf[64];
@@ -9,11 +9,11 @@ int led=31;
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(led,OUTPUT);
+  //pinMode(led,OUTPUT);
   sserial.begin(9600);
   Serial1.begin(9600);
   Serial.begin(9600);
-  Timer3.initialize(100);
+  //Timer3.initialize(100);
 //  Timer3.attachInterrupt(readData);
 //  while(!Serial){
 //    ;
