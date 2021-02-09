@@ -65,10 +65,16 @@ typedef struct Motor{
 typedef struct MsgReceived{
     char * buf;
     float RA,DA;
-    int y,m,j,h,mm,s;
+    float RARelatif,DARelatif;
+    int y,m,d,h,mm,s;
     char * mode;
-    int flags;
+    float latitude,longitude,altitude;
+    int flags; 
+    int newinstruction;
 }MsgReceived;
+
+struct Date {int d, m, y;};
+
 
 //fill struct M1 abd M2
 int MotorStructFiller(Motor* M1,Motor* M2,Motor* M3);
@@ -95,9 +101,25 @@ void positionInit(float* PosMRA,float* PosMDA,float Polaris_RA,float Polaris_DA)
 void positionreset(Motor* M);
 
 //fill the struct msg
-void msgFormating(MsgReceived * msg);
+//TODO ADD more mode and action to do after
+void msgFormating(MsgReceived * msg,object * obj,Date * d);
 
 //to read incoming data comming from port 21 22 use msgFormating
-void read(MsgReceived * msg);
+void read(MsgReceived * msg,Date * d);
+
+/////////////////////////////
+//Find and Identify
+const int monthDays[12]= { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+// AD is angle of declination; RA is right ascension ; RA H M S hours minutes seconds
+
+int countLeapYears(Date d);
+
+int getDifference(Date dt1, Date dt2);
+
+void angleBehindTheSun(MsgReceived * msg,Date * dt);
+
+void declinationAngle(MsgReceived * msg);
+
+void angleCorrection(MsgReceived * msg,Date * dt);
 
 #endif
