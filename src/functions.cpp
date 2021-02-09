@@ -182,7 +182,7 @@ void angleBehindTheSun(MsgReceived * msg,Date * dt){
 
 void declinationAngle(MsgReceived * msg){
     // return(AD - lattitude);
-    msg->DARelatif=msg->DA-msg->latitude
+    msg->DARelatif=msg->DA-msg->latitude;
 }
 
 void angleCorrection(MsgReceived * msg,Date * dt){
