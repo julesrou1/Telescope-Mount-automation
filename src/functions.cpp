@@ -128,7 +128,7 @@ void msgFormating(MsgReceived *msg,Date * dt){
   msg->buf = "";
 }
 
-void read(MsgReceived * msg,object * obj,Date * d){
+void read(MsgReceived * msg,Date * d){
   int i = 0;
   while (Serial1.available() > 0){
     msg->flags = 1;
@@ -140,7 +140,7 @@ void read(MsgReceived * msg,object * obj,Date * d){
     }
   }
   if (msg->flags == 1){
-    msgFormating(msg,obj,d);
+    msgFormating(msg,d);
   }
 }
 

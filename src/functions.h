@@ -4,7 +4,6 @@
 
 #include <Arduino.h>
 #include <math.h>
-#include "Find_And_Identify.h"
 #include <TimerOne.h>
 #include <TimerFour.h>
 #include <stdlib.h>
@@ -102,7 +101,7 @@ void positionreset(Motor* M);
 
 //fill the struct msg
 //TODO ADD more mode and action to do after
-void msgFormating(MsgReceived * msg,object * obj,Date * d);
+void msgFormating(MsgReceived * msg,Date * d);
 
 //to read incoming data comming from port 21 22 use msgFormating
 void read(MsgReceived * msg,Date * d);

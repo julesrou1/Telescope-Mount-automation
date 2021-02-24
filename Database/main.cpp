@@ -194,7 +194,16 @@ int main(){
     lineSpliting(line);
     EqToH();
     HToEq();
-    printf("%f\n",HourToDegree(22,34,01));
+    printf("%f\n",HourToDegree(6,0,0));
+
+    printf("%f\n",angleBehindTheSun({9, 02, 2021 },90));
+    // char * mode ;
+    // mode=(char*)("11");
+    // if (mode=="11")
+    // {
+    //     printf("test");
+    // }
+    
     // float Latitude=49.052502;
     // int hsol=16;
     // int msol=53;
