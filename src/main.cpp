@@ -7,20 +7,17 @@ int mapY = 0;
 int swstate=0;
 int fill=0;
 unsigned long lastFire = 0;
-const int commonPin = 2;
-const int buttonPins[] = {4,5,6};//TODO change number
+const int commonPin = 20;//TODO change number
+const int buttonPins[] = {29,31,33};//TODO change number
 struct Motor M1;
 struct Motor M2;
 struct Motor M3;
 struct MsgReceived msg;
 struct Date date;
-
+struct SemiAuto Instruction;
 void tim1(){
-  if(swstate==2){
-    cstRotate(&M1,1);
-  }
   if(swstate==1){//Joystick control
-    digitalWrite(pinLED,HIGH);
+    digitalWrite(pinLED1,HIGH);
     mapX = map(analogRead(VRx), 0, 1023, -512, 512);
     mapY = map(analogRead(VRy), 0, 1023, -512, 512);
     if(mapX>100){
@@ -36,14 +33,44 @@ void tim1(){
       rotate(1,&M2,-1,'F');
     }
   } 
-  if(swstate==0){digitalWrite(pinLED,LOW);}
+  if(swstate==0){digitalWrite(pinLED1,LOW);}
   if(swstate==0 && msg.newinstruction==1){
-    if (msg.mode == "01"){
+    if (strcmp(msg.mode,"01")==0){
       Serial.println(msg.RARelatif);
       Serial.println(msg.DARelatif);
     }
+    if(strcmp(msg.mode,"12")==0){//Calibration angle
+      Instruction.RA=msg.RARelatif;
+      Instruction.DA=msg.DARelatif;
+    }
+    if (strcmp(msg.mode,"22")==0){
+      Instruction.first++;
+      if (Instruction.first<=1){
+        Instruction.NextRA=msg.RARelatif;
+        Instruction.NextDA=msg.DARelatif;
+      }
+      
+      Instruction.RA=Instruction.NextRA;
+      Instruction.DA=Instruction.NextDA;
+
+      Instruction.NextRA=msg.RARelatif;
+      Instruction.NextDA=msg.DARelatif;
+      
+      Instruction.deltaRA=Instruction.NextRA-Instruction.RA;
+      Instruction.deltaDA=Instruction.NextDA-Instruction.DA;
+      //TODO add direction depending on result of delta.
+      rotate(Instruction.deltaRA,&M1,1,'S'); //TODO actualise les valeurs
+      rotate(Instruction.deltaRA,&M2,1,'S');
+      Instruction.rotate==1;
+    }
+    msg.newinstruction=0;
+  }
+  if(Instruction.rotate==1 || swstate==2){
+    rotate(1,&M1,1,'S'); //TODO Actualise la valeur afin de tournée a la bonne vitesse, verifier le moteur a tournée
+
   }
  }
+
 void tim4(){//Tracking de la position du moteur lors du suivie
   //TODO FIX
   if (fill==1){
@@ -98,14 +125,16 @@ void pressInterrupt() { // ISR
 
 void setup() {
   Serial.begin(9600); 
+  //display.begin();
   pinMode(VRx, INPUT);
   pinMode(VRy, INPUT);
   pinMode(swPin, INPUT_PULLUP);
-  pinMode(pinLED,OUTPUT);
+  pinMode(pinLED1,OUTPUT);
+  pinMode(pinLED2,OUTPUT);
+  pinMode(pinLED3,OUTPUT);
   attachInterrupt(digitalPinToInterrupt(swPin), swactivation, LOW); //TODO remove this function 
   configureCommon(); // Setup pins for interrupt
   attachInterrupt(digitalPinToInterrupt(commonPin), pressInterrupt, FALLING);
-
 
   Timer1.initialize(500000);
   Timer1.attachInterrupt(tim1);
@@ -124,10 +153,7 @@ void setup() {
   pinMode(M2ms2pin,OUTPUT);
   pinMode(M2ms3pin,OUTPUT);
 // Control for switch
-  pinMode(inPin, INPUT);
-  pinMode(outPin, OUTPUT);
 
-  digitalWrite(outPin,HIGH);
   digitalWrite(M2dirPin,HIGH);
   digitalWrite(M1dirPin,HIGH);
  //microstep resolution to 1/16
@@ -141,7 +167,10 @@ void setup() {
 }
 
 void loop() {
-  if(fill!=1){fill=MotorStructFiller(&M1,&M2,&M3);}
+  if(fill!=1){
+    Instruction.first=0;
+    fill=MotorStructFiller(&M1,&M2,&M3);
+    }
 
   if(swstate==0){
     read(&msg,&date);

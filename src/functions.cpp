@@ -91,7 +91,7 @@ void positionreset(Motor *M){
 void msgFormating(MsgReceived *msg,Date * dt){
   char *piece = strtok(msg->buf, ";");
   msg->mode = piece;
-  if (msg->mode == "01")//Instruction for new object to observ
+  if (strcmp(msg->mode,"01"))//Instruction for new object to observ
   {
     for (int i = 0; i < 8; i++){
       piece = strtok(NULL, ";");
@@ -115,7 +115,7 @@ void msgFormating(MsgReceived *msg,Date * dt){
     }
     angleCorrection(msg,dt);
   }
-  if (msg->mode == "00"){
+  if (strcmp(msg->mode,"00")){
     for (int i = 0; i < 8; i++){
       piece = strtok(NULL, ";");
       if (i == 0){msg->latitude = atof(piece);}
@@ -125,7 +125,7 @@ void msgFormating(MsgReceived *msg,Date * dt){
   }
   msg->flags = 0;
   msg->newinstruction=1;
-  msg->buf = "";
+  strcpy(msg->buf,"");
 }
 
 void read(MsgReceived * msg,Date * d){
@@ -148,44 +148,45 @@ void read(MsgReceived * msg,Date * d){
 //Number for day in each months
 
 int countLeapYears(Date d){
-    int years = d.y;
-    // Check if the current year needs to be considered for the count of leap years
-    if (d.m <= 2)
-        years--;
-    return (years/4) - (years/100) + (years/400); // An year is a leap year if it  is a multiple of 4,multiple of 400 and not a  multiple of 100.
+  int years = d.y;
+  // Check if the current year needs to be considered for the count of leap years
+  if (d.m <= 2)
+    years--;
+  return (years / 4) - (years / 100) + (years / 400); // An year is a leap year if it  is a multiple of 4,multiple of 400 and not a  multiple of 100.
 }
 
 int getDifference(Date dt1, Date dt2)
 {    // COUNT TOTAL NUMBER OF DAYS BEFORE FIRST DATE 'dt1'  initialize count using years and day
-    long int n1 = dt1.y * 365 + dt1.d;
-    // Add days for months in given date
-    for (int i = 0; i < dt1.m - 1; i++)
-        n1 += monthDays[i];
-    // Since every leap year is of 366 days, Add a day for every leap year
-    n1 += countLeapYears(dt1);
-    // SIMILARLY, COUNT TOTAL NUMBER OF DAYS BEFORE 'dt2'
-    long int n2 = dt2.y * 365 + dt2.d;
-    for (int i = 0; i < dt2.m - 1; i++){
-        n2 += monthDays[i];
-    }
-    n2 += countLeapYears(dt2);
+  long int n1 = dt1.y * 365 + dt1.d;
+  // Add days for months in given date
+  for (int i = 0; i < dt1.m - 1; i++)
+    n1 += monthDays[i];
+  // Since every leap year is of 366 days, Add a day for every leap year
+  n1 += countLeapYears(dt1);
+  // SIMILARLY, COUNT TOTAL NUMBER OF DAYS BEFORE 'dt2'
+  long int n2 = dt2.y * 365 + dt2.d;
+  for (int i = 0; i < dt2.m - 1; i++)
+  {
+    n2 += monthDays[i];
+  }
+  n2 += countLeapYears(dt2);
 
-    return (n2 - n1);
+  return (n2 - n1);
 }
 
 void angleBehindTheSun(MsgReceived * msg,Date * dt){
     
-    int daybetween = getDifference({ 21, 3, 2020 },*dt);
-    // return(RA-daybetween*(360/365));
-    msg->RARelatif=msg->RA-daybetween*(360/365);
+  int daybetween = getDifference({ 21, 3, 2020 },*dt);
+  // return(RA-daybetween*(360/365));
+  msg->RARelatif=msg->RA-daybetween*(360/365);
 }
 
 void declinationAngle(MsgReceived * msg){
-    // return(AD - lattitude);
-    msg->DARelatif=msg->DA-msg->latitude;
+   // return(AD - lattitude);
+  msg->DARelatif=msg->DA-msg->latitude;
 }
 
 void angleCorrection(MsgReceived * msg,Date * dt){
-    angleBehindTheSun(msg,dt);
-    declinationAngle(msg);
+  angleBehindTheSun(msg, dt);
+  declinationAngle(msg);
 }

@@ -11,38 +11,41 @@
 #include <string.h>
 #include <time.h>
 #include <SoftwareSerial.h>
+#include <SPI.h>
+#include <Wire.h>
+
 
 // defines pins numbers FOR MOTOR 1
 // Step pin and directional pin
-const int M1stepPin = 29; 
-const int M1dirPin = 31; 
+const int M1stepPin = 24; 
+const int M1dirPin = 22; 
 //Control Microstepping Resolution
-const int M1ms1pin = 23;
-const int M1ms2pin = 25;
-const int M1ms3pin = 27;
+const int M1ms1pin = 30;
+const int M1ms2pin = 28;
+const int M1ms3pin = 26;
 
 // defines pins numbers FOR MOTOR 2
 // Step pin and directional pin
-const int M2stepPin = 39; 
-const int M2dirPin = 41; 
+const int M2stepPin = 34; 
+const int M2dirPin = 32; 
 //Control Microstepping Resolution
-const int M2ms1pin = 33;
-const int M2ms2pin = 35;
-const int M2ms3pin = 37;
+const int M2ms1pin = 40;
+const int M2ms2pin = 38;
+const int M2ms3pin = 36;
 // defines pins numbers FOR MOTOR 3
 // Step pin and directional pin
-const int M3stepPin = 49; 
-const int M3dirPin = 51; 
+const int M3stepPin = 44; 
+const int M3dirPin = 42; 
 //Control Microstepping Resolution
-const int M3ms1pin = 43;
-const int M3ms2pin = 45;
-const int M3ms3pin = 47;
-//Use for switch
-const int  inPin = 48;
-const int outPin=44;
-
-const int pinLED=4;
-const int swPin = 2;
+const int M3ms1pin = 50;
+const int M3ms2pin = 48;
+const int M3ms3pin = 46;
+//Led
+const int pinLED1=23;
+const int pinLED2=25;
+const int pinLED3=27;
+//Joystick
+const int swPin = 21;
 const int VRx = A0;
 const int VRy = A1;
 
@@ -71,6 +74,15 @@ typedef struct MsgReceived{
     int flags; 
     int newinstruction;
 }MsgReceived;
+
+typedef struct SemiAuto{
+    int first;
+    float RA,DA;
+    float NextRA,NextDA;
+    float deltaRA,deltaDA;
+    int rotate; 
+    int newinstruction;
+}SemiAuto;
 
 struct Date {int d, m, y;};
 
