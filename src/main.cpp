@@ -16,11 +16,14 @@ struct Motor M3;
 struct MsgReceived msg;
 struct Date date;
 struct SemiAuto Instruction;
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 32// OLED display height, in pixels
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 void tim1(){
   if(swstate==0 && msg.newinstruction==1){
     if (strcmp(msg.mode,"01")==0){
-      Serial.println(msg.RARelatif);
-      Serial.println(msg.DARelatif);
+      // Serial.println(msg.RARelatif);
+      // Serial.println(msg.DARelatif);
     }
     if(strcmp(msg.mode,"12")==0){//Calibration angle
       Instruction.RA=msg.RARelatif;
@@ -150,7 +153,28 @@ void pressInterrupt() { // ISR
   configureCommon(); // Return to original state
 }
 
+void display2(double ra, double dec){
+  display.clearDisplay();
 
+  //affichage ra
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,8);
+  display.println("ra:");
+  display.setTextSize(1);
+  display.setCursor(20,8);
+  display.println(ra);
+
+  //affichage dec
+  display.setTextSize(1);
+  display.setCursor(0,18);
+  display.println("dec:");
+  display.setTextSize(1);
+  display.setCursor(25,18);
+  display.println(dec);
+
+  display.display();
+}
 void setup() {
   Serial.begin(9600); 
   //display.begin();
@@ -163,6 +187,12 @@ void setup() {
   pinMode(commonPin, INPUT_PULLUP);
   configureCommon(); // Setup pins for interrupt
   attachInterrupt(digitalPinToInterrupt(commonPin), pressInterrupt, FALLING);
+
+  Serial.begin(115200);
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  }
 
   Timer1.initialize(268978);
   Timer1.attachInterrupt(tim1);
