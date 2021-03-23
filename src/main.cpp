@@ -6,9 +6,10 @@ int mapX = 0;
 int mapY = 0;
 int swstate=0;
 int fill=0;
+char spd='F';
 unsigned long lastFire = 0;
-const int commonPin = 20;//TODO change number
-const int buttonPins[] = {29,31,33};//TODO change number
+const int commonPin = 2;//TODO change mode for print screen
+const int buttonPins[] = {23,25,27};//TODO change number
 struct Motor M1;
 struct Motor M2;
 struct Motor M3;
@@ -16,24 +17,6 @@ struct MsgReceived msg;
 struct Date date;
 struct SemiAuto Instruction;
 void tim1(){
-  if(swstate==1){//Joystick control
-    digitalWrite(pinLED1,HIGH);
-    mapX = map(analogRead(VRx), 0, 1023, -512, 512);
-    mapY = map(analogRead(VRy), 0, 1023, -512, 512);
-    if(mapX>100){
-      rotate(1,&M1,1,'F'); //TODO maybe move the call into loop to avoid blocking the arduino
-    }
-    if(mapX<-100){
-      rotate(1,&M1,-1,'F');
-    }
-    if(mapY>100){
-      rotate(1,&M2,1,'F');
-    }
-    if(mapY<-100){
-      rotate(1,&M2,-1,'F');
-    }
-  } 
-  if(swstate==0){digitalWrite(pinLED1,LOW);}
   if(swstate==0 && msg.newinstruction==1){
     if (strcmp(msg.mode,"01")==0){
       Serial.println(msg.RARelatif);
@@ -61,28 +44,61 @@ void tim1(){
       //TODO add direction depending on result of delta.
       rotate(Instruction.deltaRA,&M1,1,'S'); //TODO actualise les valeurs
       rotate(Instruction.deltaRA,&M2,1,'S');
-      Instruction.rotate==1;
+      Instruction.rotate=1;
     }
     msg.newinstruction=0;
   }
   if(Instruction.rotate==1 || swstate==2){
-    rotate(1,&M1,1,'S'); //TODO Actualise la valeur afin de tournée a la bonne vitesse, verifier le moteur a tournée
-
+    digitalWrite(pinLED3,HIGH);
+    digitalWrite(pinLED2,LOW);
+    rotate(0.001125,&M2,1,'F'); //TODO Actualise la valeur afin de tournée a la bonne vitesse, verifier le moteur a tournée
+    //TODO Condition to exit the function
   }
  }
 
 void tim4(){//Tracking de la position du moteur lors du suivie
   //TODO FIX
-  if (fill==1){
-  if(M1.cst==1){M1.EquatorialPosition+=(0.417828/2);// si le moteur tourne on ajoute l'angle //! Probleme de logique a revoir ici
-  }else{M1.EquatorialPosition-=(0.417828/2);}// si il ne tourne pas sont angle diminue //! melange de la position eq et de la possition relatif a la monture
+  // if (fill==1){
+  // if(M1.cst==1){M1.EquatorialPosition+=(0.417828/2);// si le moteur tourne on ajoute l'angle //! Probleme de logique a revoir ici
+  // }else{M1.EquatorialPosition-=(0.417828/2);}// si il ne tourne pas sont angle diminue //! melange de la position eq et de la possition relatif a la monture
+  // }
+  if(swstate==0){
+    digitalWrite(pinLED1,HIGH);
+    digitalWrite(pinLED3,LOW);
+    mapX = map(analogRead(VRx), 0, 1023, -512, 512);
+    if(mapX>100){
+      if(spd=='F'){rotate(0.1,&M3,1,spd);}
+      else{rotate(0.01,&M1,1,spd);}
+    }
+    if(mapX<-100){
+      if(spd=='F'){rotate(0.1,&M3,-1,spd);}
+      else{rotate(0.01,&M3,-1,spd);}
+    }
   }
+  if(swstate==1){//Joystick control
+    digitalWrite(pinLED1,LOW);
+    digitalWrite(pinLED2,HIGH);
+    mapX = map(analogRead(VRx), 0, 1023, -512, 512);
+    mapY = map(analogRead(VRy), 0, 1023, -512, 512);
+    if(mapX>100){
+      if(spd=='F'){rotate(0.1,&M1,1,spd);}
+      else{rotate(0.01,&M1,1,spd);}
+    }
+    if(mapX<-100){
+      if(spd=='F'){rotate(0.1,&M1,-1,spd);}
+      else{rotate(0.01,&M1,-1,spd);}
+    }
+    if(mapY>100){
+      if(spd=='F'){rotate(0.1,&M2,1,spd);}
+      else{rotate(0.01,&M2,1,spd);}
+    }
+    if(mapY<-100){
+      if(spd=='F'){rotate(0.1,&M2,-1,spd);}
+      else{rotate(0.01,&M2,-1,spd);}
+    }
+  } 
 }
 
-void swactivation(){
-  //TODO remove this function and the attach interupt link to it
-  swstate=(swstate+1)%3;
-}
 void configureCommon() {
   pinMode(commonPin, INPUT_PULLUP);
 
@@ -102,7 +118,20 @@ void configureDistinct() {
 }
 
 void press(int button) { // Our handler
-  Serial.println(button + 1); //TODO add code for each button
+//TODO add code for each button
+  if (button==0){
+    swstate=(swstate+1)%3;
+    digitalWrite(pinLED3,LOW);
+  }
+  if (button==1){
+    if(swstate==1||swstate==0){spd='S';}
+    digitalWrite(pinLED2,LOW);
+  }
+  if (button==2){
+    Instruction.rotate=0;
+    if(swstate==1||swstate==0){spd='F';}
+    digitalWrite(pinLED2,LOW);
+  } 
 }
 
 void pressInterrupt() { // ISR
@@ -118,7 +147,6 @@ void pressInterrupt() { // ISR
       press(i);
     }
   }
-
   configureCommon(); // Return to original state
 }
 
@@ -132,13 +160,13 @@ void setup() {
   pinMode(pinLED1,OUTPUT);
   pinMode(pinLED2,OUTPUT);
   pinMode(pinLED3,OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(swPin), swactivation, LOW); //TODO remove this function 
+  pinMode(commonPin, INPUT_PULLUP);
   configureCommon(); // Setup pins for interrupt
   attachInterrupt(digitalPinToInterrupt(commonPin), pressInterrupt, FALLING);
 
-  Timer1.initialize(500000);
+  Timer1.initialize(268978);
   Timer1.attachInterrupt(tim1);
-  Timer4.initialize(1000000);
+  Timer4.initialize(10000);
 	Timer4.attachInterrupt(tim4);
 // Sets the two pins as Outputs
   pinMode(M1stepPin,OUTPUT); 
@@ -152,10 +180,18 @@ void setup() {
   pinMode(M2ms1pin,OUTPUT);
   pinMode(M2ms2pin,OUTPUT);
   pinMode(M2ms3pin,OUTPUT);
+
+  pinMode(M3stepPin,OUTPUT); 
+  pinMode(M3dirPin,OUTPUT);
+  pinMode(M3ms1pin,OUTPUT);
+  pinMode(M3ms2pin,OUTPUT);
+  pinMode(M3ms3pin,OUTPUT);
+// Control for switch
 // Control for switch
 
   digitalWrite(M2dirPin,HIGH);
   digitalWrite(M1dirPin,HIGH);
+  digitalWrite(M3dirPin,HIGH);
  //microstep resolution to 1/16
   digitalWrite(M1ms1pin,HIGH);
   digitalWrite(M1ms2pin,HIGH);
@@ -164,16 +200,18 @@ void setup() {
   digitalWrite(M2ms1pin,HIGH);
   digitalWrite(M2ms2pin,HIGH);
   digitalWrite(M2ms3pin,HIGH);
+
+  digitalWrite(M3ms1pin,HIGH);
+  digitalWrite(M3ms2pin,HIGH);
+  digitalWrite(M3ms3pin,HIGH);
 }
 
-void loop() {
+void loop(){
   if(fill!=1){
     Instruction.first=0;
-    fill=MotorStructFiller(&M1,&M2,&M3);
+    fill=MotorStructFiller(&M1,&M2,&M3,&Instruction);
     }
-
   if(swstate==0){
     read(&msg,&date);
   }
-
 }

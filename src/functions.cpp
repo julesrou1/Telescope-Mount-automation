@@ -1,35 +1,36 @@
 #include "functions.h"
 #include <Arduino.h>
 
-int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3){
+int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3, SemiAuto *Instruction){
 
   M1->Name = "M1";
   M1->dirPin = M1dirPin;
   M1->stepPin = M1stepPin;
   M1->Direction = 1;
-  M1->Reduction = 1;
+  M1->Reduction = 100;
   M1->Position = 0;
-  M1->TimesFast = 500;
-  M1->TimesSlow = 113;
+  M1->TimesFast = 100;
+  M1->TimesSlow = 100;
 
-  M2->Name = "M2";
+  M2->Name = "M2";//moteur d'asservisement
   M2->dirPin = M2dirPin;
   M2->stepPin = M2stepPin;
   M2->Direction = 1;
-  M2->Reduction = 1;
+  M2->Reduction = 100;
   M2->Position = 0;
   M2->TimesFast = 100;
-  M2->TimesSlow = 500;
+  M2->TimesSlow = 100;
 
   M3->Name = "M3";
   M3->dirPin = M3dirPin;
   M3->stepPin = M3stepPin;
   M3->Direction = 1;
-  M3->Reduction = 1;
+  M3->Reduction = 100;
   M3->Position = 0;
   M3->TimesFast = 100;
-  M3->TimesSlow = 500;
+  M3->TimesSlow = 100;
 
+  Instruction->newinstruction=0;
   return 1;
 }
 
@@ -45,7 +46,7 @@ void setAngularMotion(float angle, Motor *M, int *nbsteptaken, char speed){
   if (speed == 'F'){
     for (int x = 0; x < step; x++){
       digitalWrite(M->stepPin, HIGH);
-      delayMicroseconds(500);
+      delayMicroseconds(100);
       digitalWrite(M->stepPin, LOW);
       delayMicroseconds(M->TimesFast);
       *nbsteptaken += (M->dirPin);
@@ -54,7 +55,7 @@ void setAngularMotion(float angle, Motor *M, int *nbsteptaken, char speed){
   else{
     for (int x = 0; x < step; x++){
       digitalWrite(M->stepPin, HIGH);
-      delayMicroseconds(500);
+      delay(100);
       digitalWrite(M->stepPin, LOW);
       delay(M->TimesSlow);
       *nbsteptaken += (M->dirPin);

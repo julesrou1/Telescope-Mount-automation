@@ -41,9 +41,9 @@ const int M3ms1pin = 50;
 const int M3ms2pin = 48;
 const int M3ms3pin = 46;
 //Led
-const int pinLED1=23;
-const int pinLED2=25;
-const int pinLED3=27;
+const int pinLED1=29;
+const int pinLED2=31;
+const int pinLED3=33;
 //Joystick
 const int swPin = 21;
 const int VRx = A0;
@@ -88,7 +88,7 @@ struct Date {int d, m, y;};
 
 
 //fill struct M1 abd M2
-int MotorStructFiller(Motor* M1,Motor* M2,Motor* M3);
+int MotorStructFiller(Motor* M1,Motor* M2,Motor* M3, SemiAuto *Instruction);
 
 //Use to do move angle(in degree),  and the time between LOW and HIGH. 
 //microstepp conf is in function directly for now is't for 1/16 step(0.1125°) NEED TO ADD NEW ARGUMENT
