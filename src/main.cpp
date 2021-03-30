@@ -1,15 +1,18 @@
 #include <Arduino.h>
 #include "functions.h"
 
-int RArotation=1;
+//int RArotation=1;
 int mapX = 0;
 int mapY = 0;
 int swstate=0;
 int fill=0;
-char spd='F';
+int spd=0;
+int readflag=0;
+int outstate4=0;
 unsigned long lastFire = 0;
 const int commonPin = 2;//TODO change mode for print screen
 const int buttonPins[] = {23,25,27};//TODO change number
+char spdindex[2]={'F','S'};
 struct Motor M1;
 struct Motor M2;
 struct Motor M3;
@@ -20,10 +23,12 @@ struct SemiAuto Instruction;
 #define SCREEN_HEIGHT 32// OLED display height, in pixels
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 void tim1(){
-  if(swstate==0 && msg.newinstruction==1){
+  if(swstate==4 && msg.newinstruction==1){//**Process info received through usb
     if (strcmp(msg.mode,"01")==0){
-      // Serial.println(msg.RARelatif);
-      // Serial.println(msg.DARelatif);
+      rotate(msg.RA,&M2,1,'F'); //TODO actualise les valeurs
+      rotate(msg.DA,&M1,1,'F');
+      Instruction.rotate=1;
+      digitalWrite(pinLED2,LOW);
     }
     if(strcmp(msg.mode,"12")==0){//Calibration angle
       Instruction.RA=msg.RARelatif;
@@ -45,13 +50,13 @@ void tim1(){
       Instruction.deltaRA=Instruction.NextRA-Instruction.RA;
       Instruction.deltaDA=Instruction.NextDA-Instruction.DA;
       //TODO add direction depending on result of delta.
-      rotate(Instruction.deltaRA,&M1,1,'S'); //TODO actualise les valeurs
-      rotate(Instruction.deltaRA,&M2,1,'S');
+      rotate(Instruction.deltaRA,&M2,1,'S'); //TODO actualise les valeurs
+      rotate(Instruction.deltaDA,&M1,1,'S');
       Instruction.rotate=1;
     }
     msg.newinstruction=0;
   }
-  if(Instruction.rotate==1 || swstate==2){
+  if(Instruction.rotate==1 || swstate==2){//**ratation a RA motor to follow object
     digitalWrite(pinLED3,HIGH);
     digitalWrite(pinLED2,LOW);
     rotate(0.001125,&M2,1,'F'); //TODO Actualise la valeur afin de tournée a la bonne vitesse, verifier le moteur a tournée
@@ -59,23 +64,26 @@ void tim1(){
   }
  }
 
-void tim4(){//Tracking de la position du moteur lors du suivie
-  //TODO FIX
+void tim4(){//TODO FIX
+  if(swstate==4){
+    digitalWrite(pinLED1,HIGH);
+    digitalWrite(pinLED3,HIGH);
+  }
   // if (fill==1){
   // if(M1.cst==1){M1.EquatorialPosition+=(0.417828/2);// si le moteur tourne on ajoute l'angle //! Probleme de logique a revoir ici
   // }else{M1.EquatorialPosition-=(0.417828/2);}// si il ne tourne pas sont angle diminue //! melange de la position eq et de la possition relatif a la monture
   // }
-  if(swstate==0){
+  if(swstate==0){//**Starting state
     digitalWrite(pinLED1,HIGH);
     digitalWrite(pinLED3,LOW);
     mapX = map(analogRead(VRx), 0, 1023, -512, 512);
     if(mapX>100){
-      if(spd=='F'){rotate(0.1,&M3,1,spd);}
-      else{rotate(0.01,&M1,1,spd);}
+      if(spd=='F'){rotate(0.1,&M3,1,spdindex[spd]);}
+      else{rotate(0.01,&M3,1,spdindex[spd]);}
     }
     if(mapX<-100){
-      if(spd=='F'){rotate(0.1,&M3,-1,spd);}
-      else{rotate(0.01,&M3,-1,spd);}
+      if(spd=='F'){rotate(0.1,&M3,-1,spdindex[spd]);}
+      else{rotate(0.01,&M3,-1,spdindex[spd]);}
     }
   }
   if(swstate==1){//Joystick control
@@ -84,20 +92,20 @@ void tim4(){//Tracking de la position du moteur lors du suivie
     mapX = map(analogRead(VRx), 0, 1023, -512, 512);
     mapY = map(analogRead(VRy), 0, 1023, -512, 512);
     if(mapX>100){
-      if(spd=='F'){rotate(0.1,&M1,1,spd);}
-      else{rotate(0.01,&M1,1,spd);}
+      if(spd=='F'){rotate(0.1,&M1,1,spdindex[spd]);}
+      else{rotate(0.01,&M1,1,spdindex[spd]);}
     }
     if(mapX<-100){
-      if(spd=='F'){rotate(0.1,&M1,-1,spd);}
-      else{rotate(0.01,&M1,-1,spd);}
+      if(spd=='F'){rotate(0.1,&M1,-1,spdindex[spd]);}
+      else{rotate(0.01,&M1,-1,spdindex[spd]);}
     }
     if(mapY>100){
-      if(spd=='F'){rotate(0.1,&M2,1,spd);}
-      else{rotate(0.01,&M2,1,spd);}
+      if(spd=='F'){rotate(0.1,&M2,1,spdindex[spd]);}
+      else{rotate(0.01,&M2,1,spdindex[spd]);}
     }
     if(mapY<-100){
-      if(spd=='F'){rotate(0.1,&M2,-1,spd);}
-      else{rotate(0.01,&M2,-1,spd);}
+      if(spd=='F'){rotate(0.1,&M2,-1,spdindex[spd]);}
+      else{rotate(0.01,&M2,-1,spdindex[spd]);}
     }
   } 
 }
@@ -123,17 +131,31 @@ void configureDistinct() {
 void press(int button) { // Our handler
 //TODO add code for each button
   if (button==0){
-    swstate=(swstate+1)%3;
-    digitalWrite(pinLED3,LOW);
+    if(swstate!=4){
+      swstate=(swstate+1)%3;
+      digitalWrite(pinLED3,LOW);
+    }
+    if(swstate==4){
+      Instruction.rotate=0;
+    }
   }
   if (button==1){
-    if(swstate==1||swstate==0){spd='S';}
-    digitalWrite(pinLED2,LOW);
+    if(swstate==1||swstate==0){
+      digitalWrite(pinLED2,LOW);
+      spd=(spd+1)%2;
+      }
   }
   if (button==2){
-    Instruction.rotate=0;
-    if(swstate==1||swstate==0){spd='F';}
-    digitalWrite(pinLED2,LOW);
+    outstate4=(outstate4+1)%2;
+    if (outstate4==1){
+      swstate=4;
+      readflag=1;
+    }
+    if (outstate4==0){
+      readflag=0; 
+      swstate=0;
+      digitalWrite(pinLED3,HIGH);
+      }
   } 
 }
 
@@ -241,7 +263,21 @@ void loop(){
     Instruction.first=0;
     fill=MotorStructFiller(&M1,&M2,&M3,&Instruction);
     }
-  if(swstate==0){
-    read(&msg,&date);
+  if(readflag==1){
+    // read(&msg,&date);
+    int i = 0;
+    while (Serial1.available() > 0){
+      msg.flags = 1;
+      byte incomingByte = Serial1.read();
+      char x1 = (char)incomingByte;
+      if (incomingByte != -1){
+       msg.buf[i] = x1;
+       i = i + 1;
+      }
+    }
+    if (msg.flags == 1){
+      digitalWrite(pinLED2,HIGH);  
+      msgFormating(&msg,&date);
+    }
   }
 }
