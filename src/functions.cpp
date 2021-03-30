@@ -64,7 +64,8 @@ void setAngularMotion(float angle, Motor *M, int *nbsteptaken, char speed){
 }
 
 void Motorpositionadd(int *nbsteptaken, Motor *M){
-  M->Position = +((*nbsteptaken) * 0.1125) / (M->Reduction);
+  //TODO A FIX
+  M->Position+=((*nbsteptaken) * 0.1125) / (M->Reduction);
 }
 
 void rotate(float angle, Motor *M, int Direction, char speed){
@@ -72,6 +73,7 @@ void rotate(float angle, Motor *M, int Direction, char speed){
   int nbsteptaken = 0;
   setAngularMotion(angle, M, &nbsteptaken, speed);
   Motorpositionadd(&nbsteptaken, M);
+  //M->Position+=angle;
 }
 
 void cstRotate(Motor *M, int Direction){

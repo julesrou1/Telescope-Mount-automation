@@ -22,6 +22,7 @@ struct SemiAuto Instruction;
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32// OLED display height, in pixels
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
 void tim1(){
   if(swstate==4 && msg.newinstruction==1){//**Process info received through usb
     if (strcmp(msg.mode,"01")==0){
@@ -86,7 +87,7 @@ void tim4(){//TODO FIX
       else{rotate(0.01,&M3,-1,spdindex[spd]);}
     }
   }
-  if(swstate==1){//Joystick control
+  if(swstate==1){//**Joystick control
     digitalWrite(pinLED1,LOW);
     digitalWrite(pinLED2,HIGH);
     mapX = map(analogRead(VRx), 0, 1023, -512, 512);
@@ -175,42 +176,6 @@ void pressInterrupt() { // ISR
   configureCommon(); // Return to original state
 }
 
-void display2(double ra, double dec){
-  display.clearDisplay();
-
-  //titre 
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(36,1);
-  display.println("STARFINDER");
-  
-
-  //rectangle entourage
-  display.drawRoundRect(0, 0, 128, 32, 3, WHITE);
-  display.drawLine(0,8,128,8,WHITE);
-
-  
-  //affichage ra
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(40,10);
-  display.println("ra:");
-  display.setTextSize(1);
-  display.setCursor(60,10);
-  display.println(ra);
-
-  //affichage dec
-  display.setTextSize(1);
-  display.setCursor(39,20);
-  display.println("dec:");
-  display.setTextSize(1);
-  display.setCursor(64,20);
-  display.println(dec);
-
-
-  display.display();
-}
-
 // Idle image, 128x32px
 static const unsigned char PROGMEM stars [] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
@@ -246,7 +211,6 @@ static const unsigned char PROGMEM stars [] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-
 
 // second idle screen, 128x32px
 static const unsigned char PROGMEM pepe [] = {
@@ -320,6 +284,43 @@ static const unsigned char telescope [] PROGMEM = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+void display2(double ra, double dec){
+  display.clearDisplay();
+
+  //titre 
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(36,1);
+  display.println("STARFINDER");
+  
+
+  //rectangle entourage
+  display.drawRoundRect(0, 0, 128, 32, 3, WHITE);
+  display.drawLine(0,8,128,8,WHITE);
+
+  
+  //affichage ra
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(40,10);
+  display.println("ra:");
+  display.setTextSize(1);
+  display.setCursor(60,10);
+  display.println(ra);
+
+  //affichage dec
+  display.setTextSize(1);
+  display.setCursor(39,20);
+  display.println("dec:");
+  display.setTextSize(1);
+  display.setCursor(64,20);
+  display.println(dec);
+
+
+  display.display();
+}
+
+
 void idleScreen(const unsigned char image[] ){
   display.clearDisplay();
   display.drawBitmap(0,0,image,128,32,1);
@@ -391,7 +392,10 @@ void loop(){
   if(fill!=1){
     Instruction.first=0;
     fill=MotorStructFiller(&M1,&M2,&M3,&Instruction);
+    idleScreen(stars);
     }
+    if (swstate==1){display2(M2.Position,M1.Position);}
+    
   if(readflag==1){
     // read(&msg,&date);
     int i = 0;
