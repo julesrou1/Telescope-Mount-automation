@@ -29,21 +29,33 @@ void display1(int n){
 void display2(double ra, double dec){
   display.clearDisplay();
 
+  //titre 
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(40,10);
+  display.println("ra:");
+  
+
+  //rectangle entourage
+  display.drawRoundRect(0, 0, 128, 32, 3, WHITE);
+  display.drawLine(0,7,128,7,WHITE);
+
+  
   //affichage ra
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(0,8);
+  display.setCursor(40,10);
   display.println("ra:");
   display.setTextSize(1);
-  display.setCursor(20,8);
+  display.setCursor(60,10);
   display.println(ra);
 
   //affichage dec
   display.setTextSize(1);
-  display.setCursor(0,18);
+  display.setCursor(40,20);
   display.println("dec:");
   display.setTextSize(1);
-  display.setCursor(25,18);
+  display.setCursor(65,20);
   display.println(dec);
 
 
