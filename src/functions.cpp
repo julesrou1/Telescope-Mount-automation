@@ -3,7 +3,7 @@
 
 int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3, SemiAuto *Instruction){
 
-  M1->Name = "M1";
+  M1->Name = "M1";//DA motor
   M1->dirPin = M1dirPin;
   M1->stepPin = M1stepPin;
   M1->Direction = 1;
@@ -12,7 +12,7 @@ int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3, SemiAuto *Instruction){
   M1->TimesFast = 100;
   M1->TimesSlow = 100;
 
-  M2->Name = "M2";//moteur d'asservisement
+  M2->Name = "M2";//moteur d'asservisement RA
   M2->dirPin = M2dirPin;
   M2->stepPin = M2stepPin;
   M2->Direction = 1;
@@ -21,7 +21,7 @@ int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3, SemiAuto *Instruction){
   M2->TimesFast = 100;
   M2->TimesSlow = 100;
 
-  M3->Name = "M3";
+  M3->Name = "M3";// Latitde motor
   M3->dirPin = M3dirPin;
   M3->stepPin = M3stepPin;
   M3->Direction = 1;
