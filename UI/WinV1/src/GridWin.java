@@ -17,6 +17,8 @@ public class GridWin extends JFrame implements ActionListener {
     protected JLabel port;
     protected JLabel conn;
     protected JButton searchButton;
+    protected JButton sendButton;
+    protected JTextField testField;
 
     @Override
     public void actionPerformed(ActionEvent a) {
@@ -45,7 +47,7 @@ public class GridWin extends JFrame implements ActionListener {
                 //Récupération de l'id + recherche dans la bdd + ouverture du port + envoi à la arduino du buffer + fermeture du port
                 String id = textField.getText();
                 System.out.println(id);// ptits test despi
-                Data data=new Data(id,"C:\\Users\\Germain\\Documents\\GitHub\\Telescope-Mount-automation\\Database\\data2.db");
+                Data data=new Data(id,"D:\\Cours\\2A\\Projet2A\\Telescope-Mount-automation\\Database\\data2.db");
                 data.printData();
                 try {
                     ArduinoConnect con = new ArduinoConnect(cport,data);
@@ -86,6 +88,7 @@ public class GridWin extends JFrame implements ActionListener {
             portList.addItem(portNames[i].getSystemPortName());
         }
         /*Création du panel text*/
+
         JPanel textPanel = new JPanel();
         searchButton = new JButton("Rechercher");
         searchButton.addActionListener(this);
@@ -94,6 +97,17 @@ public class GridWin extends JFrame implements ActionListener {
         textPanel.add(textField);
         textPanel.add(searchButton);
         this.add(textPanel, BorderLayout.CENTER);
+
+        /*Panel test*/
+        JPanel testPanel = new JPanel();
+        sendButton = new JButton("Envoyer");
+        sendButton.addActionListener(this);
+        testField=new JTextField(20);
+        testField.addActionListener(this);
+        testPanel.add(testField);
+        testPanel.add(sendButton);
+        this.add(testPanel, BorderLayout.SOUTH);
+
 
 /*        *//* Configuration du bouton de connexion *//*
         connectButton.addActionListener(new ActionListener() {
