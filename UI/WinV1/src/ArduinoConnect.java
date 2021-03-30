@@ -11,7 +11,7 @@ SerialPort sp;
        //Ouverture du port
         //char[] cbuf=buf.toCharArray();
 
-        String mod = "1";
+        String mod = "01";
         coords.setMode(mod);
 
         String buf=coords.mode+coords.ra+coords.dec+coords.time;
