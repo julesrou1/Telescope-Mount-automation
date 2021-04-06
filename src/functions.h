@@ -1,5 +1,4 @@
 #ifndef FUNCTIONS_H
-
 #define FUNCTIONS_H
 
 #include <Arduino.h>
@@ -52,15 +51,13 @@ const int VRy = A1;
 
 typedef struct Motor{
     String Name;
-    char Speed;
     int dirPin;
     int stepPin;
     int Direction;//direction +1 for trigo -1 for clock
     int Reduction; //reduction ratio
     float Position;
     float EquatorialPosition;
-    int TimesFast;
-    int TimesSlow;
+    int Times;
     int cst;
 
 } Motor;
@@ -93,7 +90,7 @@ int MotorStructFiller(Motor* M1,Motor* M2,Motor* M3, SemiAuto *Instruction);
 
 //Use to do move angle(in degree),  and the time between LOW and HIGH. 
 //microstepp conf is in function directly for now is't for 1/16 step(0.1125°) NEED TO ADD NEW ARGUMENT
-void setAngularMotion(float angle,Motor* M,int* nbsteptaken,char speed);
+void setAngularMotion(float angle,Motor* M,int* nbsteptaken);
 
 //Use for RA cst rotation
 void cstRotate(Motor *M, int Direction);
@@ -103,7 +100,7 @@ void Motorpositionadd(int* nbsteptaken,Motor* M);
 
 //Input angle to ratate, the motor the dirrection +1,-1 and the speed 'F' Fast, 'S' Slow rotate(1,&M2,-1,'F')
 //use setAngularMotion Motorpositionadd
-void rotate(float angle,Motor* M,int Direction,char speed);
+void rotate(float angle,Motor* M,int Direction);
 
 //Initial position of RA motor and DA motor to the corresponding value of polaris, to use after observing polaris.
 //TODO to work on, not sure if it is usefull
@@ -135,3 +132,4 @@ void declinationAngle(MsgReceived * msg);
 void angleCorrection(MsgReceived * msg,Date * dt);
 
 #endif
+

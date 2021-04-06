@@ -9,8 +9,8 @@ int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3, SemiAuto *Instruction){
   M1->Direction = 1;
   M1->Reduction = 100;
   M1->Position = 0;
-  M1->TimesFast = 100;
-  M1->TimesSlow = 100;
+  M1->Times = 100;
+
 
   M2->Name = "M2";//moteur d'asservisement RA
   M2->dirPin = M2dirPin;
@@ -18,8 +18,8 @@ int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3, SemiAuto *Instruction){
   M2->Direction = 1;
   M2->Reduction = 100;
   M2->Position = 0;
-  M2->TimesFast = 100;
-  M2->TimesSlow = 100;
+  M2->Times = 100;
+
 
   M3->Name = "M3";// Latitde motor
   M3->dirPin = M3dirPin;
@@ -27,14 +27,14 @@ int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3, SemiAuto *Instruction){
   M3->Direction = 1;
   M3->Reduction = 100;
   M3->Position = 0;
-  M3->TimesFast = 100;
-  M3->TimesSlow = 100;
+  M3->Times = 100;
+
 
   Instruction->newinstruction=0;
   return 1;
 }
 
-void setAngularMotion(float angle, Motor *M, int *nbsteptaken, char speed){
+void setAngularMotion(float angle, Motor *M, int *nbsteptaken){
   int step = round((angle * (M->Reduction)) / (0.1125)); //warning 0.1125 for 1/16 step change value if using microstep
 
   if (M->Direction == 1){ //setup direction high seen has positive rotation
@@ -43,43 +43,30 @@ void setAngularMotion(float angle, Motor *M, int *nbsteptaken, char speed){
   else{
     digitalWrite(M->dirPin, LOW);
   }
-  if (speed == 'F'){
-    for (int x = 0; x < step; x++){
-      digitalWrite(M->stepPin, HIGH);
-      delayMicroseconds(100);
-      digitalWrite(M->stepPin, LOW);
-      delayMicroseconds(M->TimesFast);
-      *nbsteptaken += (M->dirPin);
-    }
-  }
-  else{
-    for (int x = 0; x < step; x++){
-      digitalWrite(M->stepPin, HIGH);
-      delay(100);
-      digitalWrite(M->stepPin, LOW);
-      delay(M->TimesSlow);
-      *nbsteptaken += (M->dirPin);
-    }
+  for (int x = 0; x < step; x++){
+    digitalWrite(M->stepPin, HIGH);
+    delayMicroseconds(100);
+    digitalWrite(M->stepPin, LOW);
+    delayMicroseconds(M->Times);
+    *nbsteptaken += (M->dirPin);
   }
 }
 
+
 void Motorpositionadd(int *nbsteptaken, Motor *M){
-  //TODO A FIX
   M->Position+=((*nbsteptaken) * 0.1125) / (M->Reduction);
 }
 
-void rotate(float angle, Motor *M, int Direction, char speed){
+void rotate(float angle, Motor *M, int Direction){
   M->Direction = Direction;
   int nbsteptaken = 0;
-  setAngularMotion(angle, M, &nbsteptaken, speed);
+  setAngularMotion(angle, M, &nbsteptaken);
   Motorpositionadd(&nbsteptaken, M);
-  //M->Position+=angle;
 }
 
 void cstRotate(Motor *M, int Direction){
-  char speed = 'S';
   int nbsteptaken = 0;
-  setAngularMotion(1, M, &nbsteptaken, speed);
+  setAngularMotion(1, M, &nbsteptaken);
   Motorpositionadd(&nbsteptaken, M);
 }
 

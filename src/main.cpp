@@ -12,7 +12,7 @@ int outstate4=0;
 unsigned long lastFire = 0;
 const int commonPin = 2;//TODO change mode for print screen
 const int buttonPins[] = {23,25,27};//TODO change number
-char spdindex[2]={'F','S'};
+const char spdindex[2]={'F','S'};
 struct Motor M1;
 struct Motor M2;
 struct Motor M3;
@@ -26,8 +26,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 void tim1(){
   if(swstate==4 && msg.newinstruction==1){//**Process info received through usb
     if (strcmp(msg.mode,"01")==0){
-      rotate(msg.RA,&M2,1,'F'); //TODO actualise les valeurs
-      rotate(msg.DA,&M1,1,'F');
+      rotate(msg.RA,&M2,1); //TODO actualise les valeurs
+      rotate(msg.DA,&M1,1);
       Instruction.rotate=1;
       digitalWrite(pinLED2,LOW);
     }
@@ -51,8 +51,8 @@ void tim1(){
       Instruction.deltaRA=Instruction.NextRA-Instruction.RA;
       Instruction.deltaDA=Instruction.NextDA-Instruction.DA;
       //TODO add direction depending on result of delta.
-      rotate(Instruction.deltaRA,&M2,1,'S'); //TODO actualise les valeurs
-      rotate(Instruction.deltaDA,&M1,1,'S');
+      rotate(Instruction.deltaRA,&M2,1); //TODO actualise les valeurs
+      rotate(Instruction.deltaDA,&M1,1);
       Instruction.rotate=1;
     }
     msg.newinstruction=0;
@@ -60,7 +60,7 @@ void tim1(){
   if(Instruction.rotate==1 || swstate==2){//**ratation a RA motor to follow object
     digitalWrite(pinLED3,HIGH);
     digitalWrite(pinLED2,LOW);
-    rotate(0.001125,&M2,1,'F'); //TODO Actualise la valeur afin de tournée a la bonne vitesse, verifier le moteur a tournée
+    rotate(0.001125,&M2,1); //TODO Actualise la valeur afin de tournée a la bonne vitesse, verifier le moteur a tournée
     //TODO Condition to exit the function
   }
  }
@@ -79,12 +79,12 @@ void tim4(){//TODO FIX
     digitalWrite(pinLED3,LOW);
     mapX = map(analogRead(VRx), 0, 1023, -512, 512);
     if(mapX>100){
-      if(spd=='F'){rotate(0.1,&M3,1,spdindex[spd]);}
-      else{rotate(0.01,&M3,1,spdindex[spd]);}
+      if(spd=='F'){rotate(0.05625,&M3,1);}
+      else{rotate(0.001125,&M3,1);}
     }
     if(mapX<-100){
-      if(spd=='F'){rotate(0.1,&M3,-1,spdindex[spd]);}
-      else{rotate(0.01,&M3,-1,spdindex[spd]);}
+      if(spd=='F'){rotate(0.05625,&M3,-1);}
+      else{rotate(0.001125,&M3,-1);}
     }
   }
   if(swstate==1){//**Joystick control
@@ -93,20 +93,20 @@ void tim4(){//TODO FIX
     mapX = map(analogRead(VRx), 0, 1023, -512, 512);
     mapY = map(analogRead(VRy), 0, 1023, -512, 512);
     if(mapX>100){
-      if(spd=='F'){rotate(0.1,&M1,1,spdindex[spd]);}
-      else{rotate(0.01,&M1,1,spdindex[spd]);}
+      if(spd=='F'){rotate(0.05625,&M1,1);}
+      else{rotate(0.001125,&M1,1);}
     }
     if(mapX<-100){
-      if(spd=='F'){rotate(0.1,&M1,-1,spdindex[spd]);}
-      else{rotate(0.01,&M1,-1,spdindex[spd]);}
+      if(spd=='F'){rotate(0.05625,&M1,-1);}
+      else{rotate(0.001125,&M1,-1);}
     }
     if(mapY>100){
-      if(spd=='F'){rotate(0.1,&M2,1,spdindex[spd]);}
-      else{rotate(0.01,&M2,1,spdindex[spd]);}
+      if(spd=='F'){rotate(0.05625,&M2,1);}
+      else{rotate(0.001125,&M2,1);}
     }
     if(mapY<-100){
-      if(spd=='F'){rotate(0.1,&M2,-1,spdindex[spd]);}
-      else{rotate(0.01,&M2,-1,spdindex[spd]);}
+      if(spd=='F'){rotate(0.05625,&M2,-1);}
+      else{rotate(0.001125,&M2,-1);}
     }
   } 
 }
@@ -348,7 +348,7 @@ void setup() {
 
   Timer1.initialize(268978);
   Timer1.attachInterrupt(tim1);
-  Timer4.initialize(10000);
+  Timer4.initialize(20000);
 	Timer4.attachInterrupt(tim4);
 // Sets the two pins as Outputs
   pinMode(M1stepPin,OUTPUT); 
