@@ -16,6 +16,8 @@ public class GridWin extends JFrame implements ActionListener {
     protected JButton connectButton;
     protected JLabel port;
     protected JLabel conn;
+    protected  JLabel id;
+    protected  JLabel coor;
     protected JButton searchButton;
     protected JButton sendButton;
     protected JTextField testField;
@@ -50,7 +52,7 @@ public class GridWin extends JFrame implements ActionListener {
                 Data data=new Data(id,"D:\\Cours\\2A\\Projet2A\\Telescope-Mount-automation\\Database\\data2.db");
                 data.printData();
                 try {
-                    ArduinoConnect con = new ArduinoConnect(cport,data);
+                    ArduinoConnect con = new ArduinoConnect(cport,data,"01");
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -58,6 +60,20 @@ public class GridWin extends JFrame implements ActionListener {
                 }
                 textField.setText("");
                 break;
+            case "Envoyer" :
+            // envoi des coordonnées à la carte
+            String coor=testField.getText();
+            System.out.println(coor);
+            try{
+                ArduinoConnect con = new ArduinoConnect(cport,coor,"00;");
+            } catch (IOException e){
+                e.printStackTrace();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+            testField.setText("");
+            break;
+
         }
     }
 
@@ -94,19 +110,20 @@ public class GridWin extends JFrame implements ActionListener {
         searchButton.addActionListener(this);
         textField = new JTextField(20);
         textField.addActionListener(this);
+        id=new JLabel("id de l'objet à viser:");
+        coor=new JLabel("Long;Lat;Alt");
+        textPanel.add(id);
         textPanel.add(textField);
         textPanel.add(searchButton);
-        this.add(textPanel, BorderLayout.CENTER);
-
-        /*Panel test*/
-        JPanel testPanel = new JPanel();
         sendButton = new JButton("Envoyer");
         sendButton.addActionListener(this);
         testField=new JTextField(20);
         testField.addActionListener(this);
-        testPanel.add(testField);
-        testPanel.add(sendButton);
-        this.add(testPanel, BorderLayout.SOUTH);
+        textPanel.add(coor);
+        textPanel.add(testField);
+        textPanel.add(sendButton);
+        this.add(textPanel, BorderLayout.CENTER);
+
 
 
 /*        *//* Configuration du bouton de connexion *//*
