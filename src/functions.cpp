@@ -7,7 +7,7 @@ int MotorStructFiller(Motor *M1, Motor *M2, Motor *M3, SemiAuto *Instruction){
   M1->dirPin = M1dirPin;
   M1->stepPin = M1stepPin;
   M1->Direction = 1;
-  M1->Reduction = 100;
+  M1->Reduction = 115;
   M1->Position = 0;
   M1->Times = 100;
 
@@ -48,13 +48,13 @@ void setAngularMotion(float angle, Motor *M, int *nbsteptaken){
     delayMicroseconds(100);
     digitalWrite(M->stepPin, LOW);
     delayMicroseconds(M->Times);
-    *nbsteptaken += (M->dirPin);
+    *nbsteptaken += 1;
   }
 }
 
 
 void Motorpositionadd(int *nbsteptaken, Motor *M){
-  M->Position+=((*nbsteptaken) * 0.1125) / (M->Reduction);
+  M->Position+= (M->Direction * (*nbsteptaken) * 0.1125) / M->Reduction;
 }
 
 void rotate(float angle, Motor *M, int Direction){
@@ -106,7 +106,7 @@ void msgFormating(MsgReceived *msg,Date * dt){
     angleCorrection(msg,dt);
   }
   if (strcmp(msg->mode,"00")){
-    for (int i = 0; i < 8; i++){
+    for (int i = 0; i < 3; i++){
       piece = strtok(NULL, ";");
       if (i == 0){msg->latitude = atof(piece);}
       if (i == 1){msg->longitude = atof(piece);}
@@ -118,21 +118,21 @@ void msgFormating(MsgReceived *msg,Date * dt){
   strcpy(msg->buf,"");
 }
 
-void read(MsgReceived * msg,Date * d){
-  int i = 0;
-  while (Serial1.available() > 0){
-    msg->flags = 1;
-    byte incomingByte = Serial1.read();
-    char x1 = (char)incomingByte;
-    if (incomingByte != -1){
-      msg->buf[i] = x1;
-      i = i + 1;
-    }
-  }
-  if (msg->flags == 1){
-    msgFormating(msg,d);
-  }
-}
+// void read(MsgReceived * msg,Date * d){
+//   int i = 0;
+//   while (Serial1.available() > 0){
+//     msg->flags = 1;
+//     byte incomingByte = Serial1.read();
+//     char x1 = (char)incomingByte;
+//     if (incomingByte != -1){
+//       msg->buf[i] = x1;
+//       i = i + 1;
+//     }
+//   }
+//   if (msg->flags == 1){
+//     msgFormating(msg,d);
+//   }
+// }
 
 //////////////////////////////////////////////////////////////////////////////
 //Number for day in each months
