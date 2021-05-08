@@ -12,7 +12,7 @@ int outstate4=0;
 unsigned long lastFire = 0;
 const int commonPin = 2;//TODO change mode for print screen
 const int buttonPins[] = {23,25,27};//TODO change number
-const char spdindex[2]={'F','S'};
+const char spdindex[3]={'S','F','R'};
 struct Motor M1;
 struct Motor M2;
 struct Motor M3;
@@ -60,14 +60,15 @@ void tim1(){
   if(Instruction.rotate==1 || swstate==2){//**ratation a RA motor to follow object
     digitalWrite(pinLED3,HIGH);
     digitalWrite(pinLED2,LOW);
-    rotate(0.001125,&M2,1); //TODO Actualise la valeur afin de tournée a la bonne vitesse, verifier le moteur a tournée
-    //TODO Condition to exit the function
+    digitalWrite(pinLED1,LOW);
+    rotate(0.001125,&M2,1);
   }
  }
 
 void tim4(){//TODO FIX
   if(swstate==4){
     digitalWrite(pinLED1,HIGH);
+    digitalWrite(pinLED2,LOW);
     digitalWrite(pinLED3,HIGH);
   }
   // if (fill==1){
@@ -76,36 +77,42 @@ void tim4(){//TODO FIX
   // }
   if(swstate==0){//**Starting state
     digitalWrite(pinLED1,HIGH);
+    digitalWrite(pinLED2,LOW);
     digitalWrite(pinLED3,LOW);
     mapX = map(analogRead(VRx), 0, 1023, -512, 512);
     if(mapX>100){
-      if(spd=='F'){rotate(0.05625,&M3,1);}
+      if(spdindex[spd]=='F'){rotate(0.05625,&M3,1);}
       else{rotate(0.001125,&M3,1);}
     }
     if(mapX<-100){
-      if(spd=='F'){rotate(0.05625,&M3,-1);}
+      if(spdindex[spd]=='F'){rotate(0.05625,&M3,-1);}
       else{rotate(0.001125,&M3,-1);}
     }
   }
   if(swstate==1){//**Joystick control
     digitalWrite(pinLED1,LOW);
     digitalWrite(pinLED2,HIGH);
+    digitalWrite(pinLED3,LOW);
     mapX = map(analogRead(VRx), 0, 1023, -512, 512);
     mapY = map(analogRead(VRy), 0, 1023, -512, 512);
     if(mapX>100){
-      if(spd=='F'){rotate(0.05625,&M1,1);}
+      if(spdindex[spd]=='F'){rotate(0.028125,&M1,1);}
+      else if(spdindex[spd]=='R'){rotate(0.045,&M1,1);}
       else{rotate(0.001125,&M1,1);}
     }
     if(mapX<-100){
-      if(spd=='F'){rotate(0.05625,&M1,-1);}
+      if(spdindex[spd]=='F'){rotate(0.028125,&M1,-1);}
+      else if(spdindex[spd]=='R'){rotate(0.045,&M1,-1);}
       else{rotate(0.001125,&M1,-1);}
     }
     if(mapY>100){
-      if(spd=='F'){rotate(0.05625,&M2,1);}
+      if(spdindex[spd]=='F'){rotate(0.028125,&M2,1);}
+      else if(spdindex[spd]=='R'){rotate(0.045,&M2,1);}
       else{rotate(0.001125,&M2,1);}
     }
     if(mapY<-100){
-      if(spd=='F'){rotate(0.05625,&M2,-1);}
+      if(spdindex[spd]=='F'){rotate(0.028125,&M2,-1);}
+      else if(spdindex[spd]=='R'){rotate(0.045,&M2,-1);}
       else{rotate(0.001125,&M2,-1);}
     }
   } 
@@ -135,6 +142,8 @@ void press(int button) { // Our handler
     if(swstate!=4){
       swstate=(swstate+1)%3;
       digitalWrite(pinLED3,LOW);
+      M2.Position=0;
+      M1.Position=0;
     }
     if(swstate==4){
       Instruction.rotate=0;
@@ -143,7 +152,7 @@ void press(int button) { // Our handler
   if (button==1){
     if(swstate==1||swstate==0){
       digitalWrite(pinLED2,LOW);
-      spd=(spd+1)%2;
+      spd=(spd+1)%3;
       }
   }
   if (button==2){
@@ -151,11 +160,15 @@ void press(int button) { // Our handler
     if (outstate4==1){
       swstate=4;
       readflag=1;
+      digitalWrite(pinLED1,HIGH);
+      digitalWrite(pinLED2,LOW);
+      digitalWrite(pinLED3,HIGH);
     }
     if (outstate4==0){
       readflag=0; 
       swstate=0;
-      digitalWrite(pinLED3,HIGH);
+      Timer1.resume();
+      Timer4.resume();
       }
   } 
 }
@@ -284,6 +297,35 @@ static const unsigned char telescope [] PROGMEM = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+void displaytext(char * a,char * b){
+  display.clearDisplay();
+
+  //titre 
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(36,1);
+  display.println("STARFINDER");
+  
+
+  //rectangle entourage
+  display.drawRoundRect(0, 0, 127, 32, 3, WHITE);
+  display.drawLine(0,8,128,8,WHITE);
+
+  
+  //affichage ra
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(40,10);
+  display.println(a);
+
+  //affichage dec
+  display.setTextSize(1);
+  display.setCursor(39,20);
+  display.println(b);
+
+  display.display();
+}
+
 void display2(double ra, double dec){
   display.clearDisplay();
 
@@ -295,7 +337,7 @@ void display2(double ra, double dec){
   
 
   //rectangle entourage
-  display.drawRoundRect(0, 0, 128, 32, 3, WHITE);
+  display.drawRoundRect(0, 0, 127, 32, 3, WHITE);
   display.drawLine(0,8,128,8,WHITE);
 
   
@@ -328,8 +370,8 @@ void idleScreen(const unsigned char image[] ){
 }
 
 void setup() {
-  Serial.begin(9600); 
   //display.begin();
+  Serial1.begin(9600);
   pinMode(VRx, INPUT);
   pinMode(VRy, INPUT);
   pinMode(swPin, INPUT_PULLUP);
@@ -339,13 +381,12 @@ void setup() {
   pinMode(commonPin, INPUT_PULLUP);
   configureCommon(); // Setup pins for interrupt
   attachInterrupt(digitalPinToInterrupt(commonPin), pressInterrupt, FALLING);
-
-  Serial.begin(115200);
+  
+  Serial.begin(9600);
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
     Serial.println(F("SSD1306 allocation failed"));
     for(;;);
   }
-
   Timer1.initialize(268978);
   Timer1.attachInterrupt(tim1);
   Timer4.initialize(20000);
@@ -394,22 +435,42 @@ void loop(){
     fill=MotorStructFiller(&M1,&M2,&M3,&Instruction);
     idleScreen(stars);
     }
-    if (swstate==1){display2(M2.Position,M1.Position);}
-    
+  if (swstate==0){idleScreen(stars);}
+  if (swstate==1){display2(M2.Position,M1.Position);}
+  if (swstate==2){displaytext("Rotation","Constante");}
+  if (swstate == 4)
+    {
+      if (strcmp(msg.mode, "00") == 0)
+      {
+        display2(msg.longitude, msg.latitude);
+      }
+      else if(strcmp(msg.mode, "01") == 0)
+      {
+        displaytext("PC", "CHECK");
+      }
+      else
+      {
+        Serial.print(msg.mode);
+        displaytext("PC","Control");
+      }
+    }
   if(readflag==1){
+    Timer1.stop();
+    Timer4.stop();
     // read(&msg,&date);
     int i = 0;
     while (Serial1.available() > 0){
       msg.flags = 1;
-      byte incomingByte = Serial1.read();
+      int incomingByte = Serial1.read();
       char x1 = (char)incomingByte;
+
       if (incomingByte != -1){
-       msg.buf[i] = x1;
-       i = i + 1;
+        msg.buf[i] = x1;
+        i = i + 1;
+        Serial.print(x1);
       }
     }
-    if (msg.flags == 1){
-      digitalWrite(pinLED2,HIGH);  
+    if (msg.flags == 1){  
       msgFormating(&msg,&date);
     }
   }

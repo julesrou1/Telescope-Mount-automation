@@ -43,19 +43,19 @@ void loop() {
 }
 
 //
-//void SerialEvent1(){
-  //digitalWrite(led,HIGH);
-  //delay(1000);
-  //digitalWrite(led,LOW);
+// void SerialEvent1(){
+//   digitalWrite(led,HIGH);
+//   delay(1000);
+//   digitalWrite(led,LOW);
 //    while(Serial1.available()){
 //      byte incomingByte = Serial1.read();
 //      if (incomingByte != -1){
 //        buf[i]=incomingByte;
 //        i=i+1;
-        //Serial.print("J'ai reçu : ");
-        //Serial.println(incomingByte);
+//         Serial.print("J'ai reçu : ");
+//         Serial.println(incomingByte);
       
-//}
+// }
 
 //void readData(){
 //while(Serial1.available()>0){

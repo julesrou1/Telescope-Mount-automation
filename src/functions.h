@@ -114,7 +114,7 @@ void positionreset(Motor* M);
 void msgFormating(MsgReceived * msg,Date * d);
 
 //to read incoming data comming from port 21 22 use msgFormating
-void read(MsgReceived * msg,Date * d);
+// void read(MsgReceived * msg,Date * d);
 
 /////////////////////////////
 //Find and Identify
