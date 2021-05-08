@@ -65,7 +65,7 @@ public class GridWin extends JFrame implements ActionListener {
             String coor=testField.getText();
             System.out.println(coor);
             try{
-                ArduinoConnect con = new ArduinoConnect(cport,coor,"00;");
+                ArduinoConnect con1 = new ArduinoConnect(cport,coor,"00;");
             } catch (IOException e){
                 e.printStackTrace();
             } catch (InterruptedException e){

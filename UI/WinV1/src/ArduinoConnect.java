@@ -30,7 +30,7 @@ SerialPort sp;
         }
         sp.getOutputStream().flush();
         System.out.println("Je viens d'envoyer :" + Arrays.toString(cbuf));
-        Thread.sleep(0,1);
+        Thread.sleep(0,200000);
         //Fermeture du port
         if (sp.closePort()){
             System.out.println("Port refermé !");
@@ -58,7 +58,7 @@ SerialPort sp;
         }
         sp.getOutputStream().flush();
         System.out.println("Je viens d'envoyer :" + Arrays.toString(cbuf));
-        Thread.sleep(0,1);
+        Thread.sleep(0,200000);
         //Fermeture du port
         if (sp.closePort()){
             System.out.println("Port refermé !");
